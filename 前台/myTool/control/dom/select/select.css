@@ -1,0 +1,65 @@
+/*
+    样式1
+    
+    白色风格
+*/
+
+.select1 {
+    /*width: 200px;*/
+    border: 0px solid red;
+    cursor: pointer;
+    position: relative;
+}
+.select1 .title {
+    padding: 5px 18px 5px 5px;
+    width: 285px;
+    height: 18px;
+    line-height: 18px;
+    border-radius: 3px;
+    border: 1px solid #a2a2a2;
+    display: block;
+    vertical-align: middle;
+    position: relative;
+    z-index: 10;
+}
+.select1 .title:hover {
+    color: #0080FF;
+}
+.select1 .arrow {
+    width: 0;
+    height: 0;
+    /*overflow: hidden;
+font-size: 0;*/
+    border-width: 5px;
+    border-color: gray transparent transparent transparent;
+    border-style: solid;
+    position: absolute;
+    /*left: 95%;*/
+    right:10px;
+    top: 50%;
+}
+.select1 .option {
+    border-style: solid;
+    border-width: 0px 1px 1px 1px;
+    border-color: #d4d5d6;
+    list-style: none;
+    margin-top: -1px;
+    position: absolute;
+    z-index: 9;
+    padding: 0;
+    width: 308px;
+    display: none;
+}
+.select1 .option li {
+    border-bottom: none;
+    background-color: #fff;
+    width: 100%;
+}
+.select1 .option li:hover {
+    background-color: #E6EFF6;
+}
+.select1 .option a {
+    text-decoration: none;
+    padding-left: 14px;
+    color: #333;
+}

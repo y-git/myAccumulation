@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+  <Test_CrawlFileReport_20130624 clientip="1351190794" filename="appoperlog_20130619195858_4980713_10.177.135.213.txt.gz" logname="a" filesize="10" appid="1" correct="1" wrong="1" discard="0" crawl_time="1" report_time="1372050000"/>
+  <Test_CrawlFileReport_20130624 clientip="1485408522" filename="appoperlog_20130622044335_2362216_10.137.130.242.txt.gz" logname="a" filesize="20" appid="1" correct="2" wrong="3" discard="0" crawl_time="10" report_time="1372050100"/>
+ <Test_CrawlFileReport_20130624 clientip="1485408522" filename="appoperlog_20130622044335_2362216_10.137.130.242.txt.gz" logname="a" filesize="50" appid="1" correct="5" wrong="1" discard="0" crawl_time="1" report_time="1372050300"/>
+<Test_CrawlFileReport_20130624 clientip="1485408522" filename="appoperlog_20130622044335_2362216_10.137.130.242.txt.gz" logname="a" filesize="10" appid="2" correct="2" wrong="5" discard="0" crawl_time="1" report_time="1372050500"/>
+<Test_CrawlFileReport_20130624 clientip="1485408522" filename="appoperlog_20130622044335_2362216_10.137.130.245.txt.gz" logname="a" filesize="10" appid="2" correct="1" wrong="1" discard="0" crawl_time="1" report_time="1372050600"/>
+<Test_CrawlFileReport_20130624 clientip="1485408522" filename="appoperlog_20130622044335_2362216_10.137.130.246.txt.gz" logname="a" filesize="10" appid="3" correct="3" wrong="0" discard="0" crawl_time="2" report_time="1372050700"/>
+<Test_CrawlFileReport_20130624 clientip="1485408522" filename="appoperlog_20130622044335_2362216_10.137.130.247.txt.gz" logname="a" filesize="30" appid="4" correct="3" wrong="1" discard="0" crawl_time="0" report_time="1372050900"/>
+
+<Test_CrawlFileReport_20130624 clientip="1485408522" filename="appoperlog_20130622044335_2362216_10.137.130.248.txt.gz" logname="b" filesize="60" appid="4" correct="2" wrong="2" discard="0" crawl_time="6" report_time="1372050500"/>
+<Test_CrawlFileReport_20130624 clientip="1485408522" filename="appoperlog_20130622044335_2362216_10.137.130.249.txt.gz" logname="b" filesize="10" appid="4" correct="1" wrong="1" discard="0" crawl_time="1" report_time="1372050600"/>
+
+</dataset>

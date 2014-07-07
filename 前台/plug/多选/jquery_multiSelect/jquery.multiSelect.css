@@ -1,0 +1,101 @@
+/*class="multiSelect"的超链接*/
+a.multiSelect {	
+/*	#FFF为白色；*/
+	background: #FFF url(/Scripts/jquery_multiSelect/dropdown.blue.png) no-repeat right center;
+	border: solid 1px #BBB;
+	padding-right: 20px;
+	position: relative;
+	cursor: default;
+/* text-decoration 屬性是用來設定文字上有什麼裝飾。	*/
+	text-decoration: none;
+/*	color 属性规定文本的颜色。*/
+	color: black;
+/*	解决兼容性问题*/
+	display: -moz-inline-stack;
+	display: inline-block;
+	*display: inline;
+	zoom: 1;
+/*	vertical-align 属性设置元素的垂直对齐方式。*/
+	vertical-align: top;
+}
+/*a.red : visited {color: #FF0000}*/
+/*<a class="red" href="css_syntax.asp">CSS Syntax</a>假如上面的例子中的链接被访问过，那么它将显示为红色*/
+
+/*a.multiSelect:link, a.multiSelect:visited, a.multiSelect:hover, a.multiSelect:active   这种写法也对*/
+a.multiSelect a:link, a.multiSelect a:visited, a.multiSelect a:hover, a.multiSelect a:active {
+	color: black;
+	text-decoration: none;
+}
+
+a.multiSelect span
+{
+	margin: 1px 0px 1px 3px;
+/*不用overflow，否则在ie下会出现问题*/
+/*	overflow: hidden;*/	
+	display: -moz-inline-stack;
+	display: inline-block;
+	*display: inline;
+	zoom: 1;
+	white-space: nowrap;
+}
+
+a.multiSelect.hover {
+	background-image: url(/Scripts/jquery_multiSelect/dropdown.blue.hover.png);
+}
+
+a.multiSelect.active, 
+a.multiSelect.focus {
+	border: inset 1px #000;
+}
+
+a.multiSelect.active {
+	background-image: url(/Scripts/jquery_multiSelect/dropdown.blue.active.png);
+}
+.p1{
+	color:red;
+	}
+.multiSelectOptions {
+	margin-top: -1px;
+	overflow-y: auto;
+	overflow-x: hidden;
+	border: solid 1px #B2B2B2;
+	background: #FFF;
+}
+
+.multiSelectOptions LABEL {
+	padding: 0px 2px;
+	display: block;
+	white-space: nowrap;
+}
+
+.multiSelectOptions LABEL.optGroup
+{
+	font-weight: bold;
+}
+
+.multiSelectOptions .optGroupContainer LABEL
+{
+	padding-left: 10px;
+}
+
+.multiSelectOptions.optGroupHasCheckboxes .optGroupContainer LABEL
+{
+	padding-left: 18px;
+}
+
+.multiSelectOptions input{
+	vertical-align: middle;
+}
+
+.multiSelectOptions LABEL.checked {
+	background-color: #dce5f8;
+}
+
+.multiSelectOptions LABEL.selectAll {
+	border-bottom: dotted 1px #CCC;
+}/*一流素材网www.16sucai.com*/
+
+.multiSelectOptions LABEL.hover {
+	background-color: #3399ff;
+	color: white;
+}

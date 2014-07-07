@@ -1,0 +1,17 @@
+{"a": {
+    "flipX": false,
+    "flipY": false,
+    "pixelOffsetX": 11,
+    "pixelOffsetY": 0,
+    "repeatNum": 3,
+    "duration": 2,
+    "frames": ["shootingRange_blue", "shootingRange_red"]
+}, "b": {
+    "flipX": false,
+    "flipY": false,
+    "pixelOffsetX": 222,
+    "pixelOffsetY": 0,
+    "repeatNum": 3,
+    "duration": 2,
+    "frames": ["base_blue", "base_red"]
+}}
