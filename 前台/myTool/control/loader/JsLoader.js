@@ -146,7 +146,7 @@ QQ: 395976266
             preload: (function () {
                 var preload = null;
 
-                if (YYC.Tool.judge.browser.ie) {
+                if (YYC.Tool.judge.browser.isIE()) {
                     preload = function (fileSrc) {
                         new Image().src = fileSrc;  //灯塔模式
                     };

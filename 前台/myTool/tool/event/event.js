@@ -128,7 +128,7 @@ YYC.namespace("Tool").event = (function(){
             var target = e.srcElement || e.target;
 
             //ie
-            if (Tool.judge.browser.ie) {
+            if (Tool.judge.browser.isIE()) {
                 e.pageX = e.clientX + document.body.scrollLeft || document.documentElement.scrollLeft;
                 e.pageY = e.clientY + document.body.scrollTop || document.documentElement.scrollTop;
 
@@ -144,7 +144,7 @@ YYC.namespace("Tool").event = (function(){
                     e.relatedTarget = e.fromElement;
                 }
 
-                if(!Tool.judge.browser.ie9){
+                if(!Tool.judge.browser.isIE9){
                     switch (e.button) {
                         case 1:
                             e.mouseButton = 0;

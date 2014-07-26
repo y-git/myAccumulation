@@ -14,7 +14,7 @@ YYC.namespace("Tool").selector = (function(){
                 throw new Error("e未定义");
             }
 
-            return (YYC.Tool.judge.browser.ie && e.srcElement) || e.target;
+            return (YYC.Tool.judge.browser.isIE() && e.srcElement) || e.target;
         },
         //获得当前样式
         /*            <style type="text/css">

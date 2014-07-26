@@ -72,20 +72,21 @@
             },
             ye_startLoop: function () {
                 var self = this,
-                    callback = null;
+                    mainLoop = null;
 
                 if (this.ye_isToUseIntervalLoop()) {
-                    this.ye_loopId = window.setInterval(function () {
+                    this.ye_loopId = window.setInterval(function mainLoop() {
                         self.ye_loopBody(self.ye_getTimeNow());
                     }, this.ye_loopInterval * 1000);
+
                     this.ye_isIntervalLoop = true;
                 }
                 else {
-                    callback = function (time) {
+                    mainLoop = function (time) {
                         self.ye_loopBody(time);
-                        self.ye_loopId = window.requestNextAnimationFrame(callback);
+                        self.ye_loopId = window.requestNextAnimationFrame(mainLoop);
                     };
-                    this.ye_loopId = window.requestNextAnimationFrame(callback);
+                    this.ye_loopId = window.requestNextAnimationFrame(mainLoop);
                     this.ye_isIntervalLoop = false;
                 }
             },
@@ -145,7 +146,7 @@
                 this.ye_lastLoopInterval = this.ye_loopInterval;
 
 ////                降低cpu消耗
-//                this.setLoopInterval(1);
+//                this.setLoopIntervalAndRestart(1);
 
                 this.ye_endLoop();
             },
@@ -163,13 +164,13 @@
              * 设置主循环间隔时间
              * @param interval 间隔时间（单位为秒）
              */
-            setLoopInterval: function (interval) {
+            setLoopIntervalAndRestart: function (interval) {
                 this.ye_loopInterval = interval;
                 this.ye_endLoop();
                 this.ye_startLoop();
             },
             resumeRequestAnimFrameLoop: function () {
-                this.ye_loopInterval = this.ye_STARTING_FPS;
+                this.ye_loopInterval = 1 / this.ye_STARTING_FPS;
                 this.ye_endLoop();
                 this.ye_startLoop();
             },
@@ -205,9 +206,3 @@
         }
     });
 }());
-
-
-
-
-
-

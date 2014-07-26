@@ -34,8 +34,20 @@ describe("YTool.js", function () {
                 expect(convert.toString([1, "b"])).toEqual('[1,"b"]');
                 //expect(convert.toString(new Date(1000))).toEqual('"1970-01-01T00:00:01.000Z"');
             });
-            it("jquery对象转换为string", function () {
+            it("jquery对象转换为字符串", function () {
                 expect(convert.toString($("<div>a</div>"))).toEqual("<div>a</div>");
+            });
+            it("转换js代码为字符串", function () {
+                var str = convert.toString(function () {
+                    var t = "a",
+                        m = 'b';
+
+                    return 1+2;
+                });
+
+                expect(str).toContain('var t = "a"');
+                expect(str).toContain("m = 'b';");
+                expect(str).toContain("return 1\\+2");
             });
             it("其余类型的参数转换为字符串", function () {
                 //expect(convert.toNumber("")).toEqual(0);

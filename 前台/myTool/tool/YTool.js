@@ -1,13 +1,6 @@
-﻿/***********************************************
- 工具箱YTool   v0.1
+﻿(function () {
+    var global = this;
 
- 作者：YYC
- 电子邮箱：395976266@qq.com
- QQ: 395976266
- 博客：http://www.cnblogs.com/chaogex/
-
- ************************************************/
-(function () {
     //* 配置命名空间
     //默认“YYC.Tool”为工具箱的命名空间
 
@@ -31,7 +24,7 @@
              namespace("Tool.Button");
              */
             namespace: function (str) {
-                var parent = window[YToolConfig.topNamespace],
+                var parent = global[YToolConfig.topNamespace],
                     parts = str.split('.'),
                     i = 0,
                     len = 0;
@@ -63,7 +56,7 @@
                 });
              */
             register: function (str, func) {
-                var parent = window[YToolConfig.topNamespace],
+                var parent = global[YToolConfig.topNamespace],
                     parts = str.split('.'),
                     i = 0,
                     len = 0;
@@ -103,24 +96,38 @@
              */
             browser: {
                 //ie: +[1, ],   //有问题！在ie下“+[1, ]”居然为false！！！！？？？
-                ie: !!(document.all && navigator.userAgent.indexOf('Opera') === -1),
+                isIE: function () {
+                    return !!(document.all && navigator.userAgent.indexOf('Opera') === -1);
+                },
                 //不能用===，因为navigator.appVersion.match(/MSIE\s\d/i)为object类型，不是string类型
-                ie7: navigator.appVersion.match(/MSIE\s\d/i) == "MSIE 7",
-                ie8: navigator.appVersion.match(/MSIE\s\d/i) == "MSIE 8",
-                ie9: navigator.appVersion.match(/MSIE\s\d/i) == "MSIE 9",
-                ff: navigator.userAgent.indexOf("Firefox") >= 0 && true,
-                opera: navigator.userAgent.indexOf("Opera") >= 0 && true,
-                chrome: navigator.userAgent.indexOf("Chrome") >= 0 && true
+                isIE7: function () {
+                    return navigator.appVersion.match(/MSIE\s\d/i) == "MSIE 7";
+                },
+                isIE8: function () {
+                    return navigator.appVersion.match(/MSIE\s\d/i) == "MSIE 8";
+                },
+                isIE9: function () {
+                    return navigator.appVersion.match(/MSIE\s\d/i) == "MSIE 9";
+                },
+                isFF: function () {
+                    return navigator.userAgent.indexOf("Firefox") >= 0 && true;
+                },
+                isOpera: function () {
+                    return  navigator.userAgent.indexOf("Opera") >= 0 && true;
+                },
+                isChrome: function () {
+                    return navigator.userAgent.indexOf("Chrome") >= 0 && true;
+                }
             },
             /**
              * 判断是否为jQuery对象
              */
             isjQuery: function (ob) {
-                if (!jQuery) {
-                    throw new Error("jQuery未定义！");
+                if (!global.jQuery) {
+                    return false;
                 }
 
-                return ob instanceof jQuery;
+                return ob instanceof global.jQuery;
             },
             isFunction: function (func) {
                 return Object.prototype.toString.call(func) === "[object Function]";
@@ -231,7 +238,10 @@
                 return $(children).parents(parentSelector).length >= 1
             }
         }
-    }());
+    }
+        ()
+        )
+    ;
     /**
      * 转换类型
      */
@@ -363,6 +373,18 @@
             return d.html();
         }
 
+        // 将js代码转换为多行字符串
+        // 示例：
+        // _convertCodeToString(function () {
+        // var a = {
+        // func: function () {
+        // }
+        // };
+        // });
+        function _convertCodeToString(fn) {
+            return fn.toString().split('\n').slice(1, -1).join('\n') + '\n'
+        }
+
         return {
             toNumber: function (obj) {
                 return Number(obj);
@@ -398,9 +420,13 @@
                     return _jqToString(obj);
                 }
 
+                if (judge.isFunction(obj)) {
+                    return _convertCodeToString(obj);
+                }
+
                 if (judge.isDirectObject(obj) || judge.isArray(obj)) {
-                    if (window.JSON && window.JSON.stringify) {
-                        return window.JSON.stringify(obj);
+                    if (global.JSON && global.JSON.stringify) {
+                        return global.JSON.stringify(obj);
                     }
                     else {
                         return JSON.stringify(obj);
@@ -425,8 +451,8 @@
                     throw new Error("参数必须为字符串");
                 }
 
-                if (window.JSON && window.JSON.parse) {
-                    return window.JSON.parse(obj);
+                if (global.JSON && global.JSON.parse) {
+                    return global.JSON.parse(obj);
                 }
                 else {
                     return JSON.parse(obj);
@@ -728,7 +754,7 @@
              * 等待second秒后，执行nextStep。可指定nextStep指向obj。
              *
              * 示例：
-             * wait(window, 3); //暂停3秒，此处指定nextStep中的this指向window
+             * wait(global, 3); //暂停3秒，此处指定nextStep中的this指向window
              this.nextStep = function () {   //3秒后执行的函数，里面的this已指向window
 	            alert("Next!");
 	            alert(this);
@@ -737,30 +763,30 @@
             wait: function (obj, second) {
                 var ind = -1;
                 //内部函数goOn
-                //该函数把要暂停的函数放到数组window.eventList里，同时通过setTimeout来调用继续函数(nextStep)。 
+                //该函数把要暂停的函数放到数组window.eventList里，同时通过setTimeout来调用继续函数(nextStep)。
                 function goOn(ind) {
-                    var obj = window.eventList[ind];
+                    var obj = global.eventList[ind];
                     var i = 0;
 
-                    window.eventList[ind] = null;
+                    global.eventList[ind] = null;
                     if (obj.nextStep) obj.nextStep.call(obj, null); //这里调用后续方法
                     else obj();
                 };
 
-                if (window.eventList == null) {
-                    window.eventList = new Array();
+                if (global.eventList == null) {
+                    global.eventList = new Array();
                 }
 
-                for (i = 0; window.eventList.length; i++) {
-                    if (window.eventList[i] == null) {
-                        window.eventList[i] = obj;
+                for (i = 0; global.eventList.length; i++) {
+                    if (global.eventList[i] == null) {
+                        global.eventList[i] = obj;
                         ind = i;
                         break;
                     }
                 }
                 if (ind == -1) {
-                    ind = window.eventList.length;
-                    window.eventList[ind] = obj;
+                    ind = global.eventList.length;
+                    global.eventList[ind] = obj;
                 }
                 setTimeout(function () {
                     goOn(ind);  //调用内部函数goOn
@@ -783,11 +809,11 @@
                 //以第一个计时器序号为起始值（计时器的序号会递加，但是ie下每次刷新浏览器后计时器序号会叠加，
                 //且最初的序号也不一定从1开始（可能比1大），也就是说ie下计时器序号的起始值可能很大；chrome和firefox计时器每次从1开始）
                 for (i = firstIndex; i < num; i++) {
-                    window.clearTimeout(i);
+                    global.clearTimeout(i);
                 }
                 //for (i = firstIndex.timer_firstIndex; i < num; i++) {
                 for (i = firstIndex; i < num; i++) {
-                    window.clearInterval(i);
+                    global.clearInterval(i);
                 }
             },
             /**
@@ -851,7 +877,7 @@
                         }
                         else {  //func为url字符串
                             if (Tool.judge.isString(func)) {
-                                window.location.href = func;    //跳转到对应模块
+                                global.location.href = func;    //跳转到对应模块
                             }
                         }
                     }
@@ -1013,10 +1039,10 @@
             /*验证码*/
             createCode: function () {
                 var code = "";
-                var codeLength = 6; //验证码的长度   
+                var codeLength = 6; //验证码的长度
                 var checkCode = document.getElementById("checkCode");
 
-                //所有候选组成验证码的字符，当然也可以用中文的      
+                //所有候选组成验证码的字符，当然也可以用中文的
                 var selectChar = new Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'A', 'B', 'C', 'D', 'E', 'F', 'G',
                     'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
 
@@ -1175,7 +1201,7 @@
                 //设置select中对应value的option选中
                 selectByValue: function (id, array) {
                     //ff下select需要刷新
-                    if (Tool.judge.browser.ff) {
+                    if (Tool.judge.browser.isFF()) {
                         Tool.select.selectNone(id);
                     }
 
@@ -1195,7 +1221,7 @@
         return {
             /*返回当前元素*/
             current: function (e) {
-                /*  已修改！这样谷歌浏览器下也可以正常返回！ 
+                /*  已修改！这样谷歌浏览器下也可以正常返回！
                  9-28
 
                  return (this.Browser.ff && arguments[0].target) || (this.Browser.ie && arguments[0].srcElement);
@@ -1204,7 +1230,7 @@
                     throw new Error("e未定义");
                 }
 
-                return (Tool.judge.browser.ie && e.srcElement) || e.target;
+                return (Tool.judge.browser.isIE() && e.srcElement) || e.target;
             },
             /*  获得当前样式
 
@@ -1320,15 +1346,17 @@
                     len = 0,
                     temp = null;
 
-                if (oTarget instanceof jQuery) {
+                if (Tool.judge.isjQuery(oTarget)) {
                     oTarget.each(function () {
                         dom = this;
 
                         if (Tool.judge.isHostMethod(dom, "addEventListener")) {
                             dom.addEventListener(sEventType, fnHandler, false);
-                        } else if (Tool.judge.isHostMethod(dom, "attachEvent")) {
+                        }
+                        else if (Tool.judge.isHostMethod(dom, "attachEvent")) {
                             dom.attachEvent("on" + sEventType, fnHandler);
-                        } else {
+                        }
+                        else {
                             dom["on" + sEventType] = fnHandler;
                         }
                     });
@@ -1338,9 +1366,11 @@
 
                     if (Tool.judge.isHostMethod(dom, "addEventListener")) {
                         dom.addEventListener(sEventType, fnHandler, false);
-                    } else if (Tool.judge.isHostMethod(dom, "attachEvent")) {
+                    }
+                    else if (Tool.judge.isHostMethod(dom, "attachEvent")) {
                         dom.attachEvent("on" + sEventType, fnHandler);
-                    } else {
+                    }
+                    else {
                         dom["on" + sEventType] = fnHandler;
                     }
                 }
@@ -1349,14 +1379,16 @@
                 var dom = null;
 
 
-                if (oTarget instanceof jQuery) {
+                if (Tool.judge.isjQuery(oTarget)) {
                     oTarget.each(function () {
                         dom = this;
                         if (Tool.judge.isHostMethod(dom, "removeEventListener")) {
                             dom.removeEventListener(sEventType, fnHandler, false);
-                        } else if (Tool.judge.isHostMethod(dom, "detachEvent")) {
+                        }
+                        else if (Tool.judge.isHostMethod(dom, "detachEvent")) {
                             dom.detachEvent("on" + sEventType, fnHandler);
-                        } else {
+                        }
+                        else {
                             dom["on" + sEventType] = null;
                         }
                     });
@@ -1365,9 +1397,11 @@
                     dom = oTarget;
                     if (Tool.judge.isHostMethod(dom, "removeEventListener")) {
                         dom.removeEventListener(sEventType, fnHandler, false);
-                    } else if (Tool.judge.isHostMethod(dom, "detachEvent")) {
+                    }
+                    else if (Tool.judge.isHostMethod(dom, "detachEvent")) {
                         dom.detachEvent("on" + sEventType, fnHandler);
-                    } else {
+                    }
+                    else {
                         dom["on" + sEventType] = null;
                     }
                 }
@@ -1379,10 +1413,10 @@
              event.target: 返回事件源，就是发生事件的元素
              event.preventDefault: 阻止默认事件动作
              event.stopBubble: 阻止冒泡
-             event.offsetLeft:为匹配的元素集合中获取第一个元素的当前坐标的left，相对于文档（document）。
-             event.offsetTop:为匹配的元素集合中获取第一个元素的当前坐标的top，相对于文档（document）。
-             event.positionLeft:获取匹配元素中第一个元素的当前坐标的left，相对于offset parent的坐标。( offset parent指离该元素最近的而且被定位过的祖先元素 )
-             event.positionTop:获取匹配元素中第一个元素的当前坐标的top，相对于offset parent的坐标。( offset parent指离该元素最近的而且被定位过的祖先元素 )
+             //event.offsetLeft:为匹配的元素集合中获取第一个元素的当前坐标的left，相对于文档（document）。
+             //event.offsetTop:为匹配的元素集合中获取第一个元素的当前坐标的top，相对于文档（document）。
+             //event.positionLeft:获取匹配元素中第一个元素的当前坐标的left，相对于offset parent的坐标。( offset parent指离该元素最近的而且被定位过的祖先元素 )
+             //event.positionTop:获取匹配元素中第一个元素的当前坐标的top，相对于offset parent的坐标。( offset parent指离该元素最近的而且被定位过的祖先元素 )
              event.pageX: 鼠标相对于文档的左边缘的位置。
              event.pageY: 鼠标相对于文档的上边缘的位置。
              event.relatedTarget: 发生mouseover和mouseout事件时，相关的dom元素。
@@ -1394,11 +1428,11 @@
 
              */
             wrapEvent: function (oEvent) {
-                var e = oEvent ? oEvent : window.event,
+                var e = oEvent ? oEvent : global.event,
                     target = e.srcElement || e.target;
 
                 //ie
-                if (Tool.judge.browser.ie) {
+                if (Tool.judge.browser.isIE()) {
                     e.pageX = e.clientX + document.body.scrollLeft || document.documentElement.scrollLeft;
                     e.pageY = e.clientY + document.body.scrollTop || document.documentElement.scrollTop;
 
@@ -1406,14 +1440,15 @@
                         e.cancelBubble = true;
                     };
 
-                    if (Tool.judge.browser.ie7 && Tool.judge.browser.ie8) {
+                    if (Tool.judge.browser.isIE7() || Tool.judge.browser.isIE8()) {
                         e.preventDefault = function () {
                             e.returnValue = false;
                         };
 
                         if (e.type == "mouseout") {
                             e.relatedTarget = e.toElement;
-                        } else if (e.type == "mouseover") {
+                        }
+                        else if (e.type == "mouseover") {
                             e.relatedTarget = e.fromElement;
                         }
 
@@ -1432,23 +1467,25 @@
                                 break;
                         }
                     }
+                    else {
+                        e.mouseButton = e.button;
+                    }
                 }
                 else {
                     e.stopBubble = e.stopPropagation;
 
                     e.keyCode = e.which;
+                    //注意：firefox没有多个键一起按的事件
+                    e.mouseButton = e.button;
                 }
-                //注意：firefox没有多个键一起按的事件
-                e.mouseButton = e.button;
-
                 e.target = target;
 
 
-                e.offsetLeft = $(target).offset().left;   //使用jquery的方法
-                e.offsetTop = $(target).offset().top;     //使用jquery的方法
-
-                e.positionLeft = $(target).position().left;   //使用jquery的方法
-                e.positionTop = $(target).position().top;   //使用jquery的方法
+//                e.offsetLeft = $(target).offset().left;   //使用jquery的方法
+//                e.offsetTop = $(target).offset().top;     //使用jquery的方法
+//
+//                e.positionLeft = $(target).position().left;   //使用jquery的方法
+//                e.positionTop = $(target).position().top;   //使用jquery的方法
 
                 return e;
             },
@@ -1506,7 +1543,7 @@
              //例子1 立即触发鼠标被按下事件
              var fireOnThis = document.getElementById('someID');
              var evObj = document.createEvent('MouseEvents');
-             evObj.initMouseEvent( 'click', true, true, window, 1, 12, 345, 7, 220, false, false, true, false, 0, null );
+             evObj.initMouseEvent( 'click', true, true, global, 1, 12, 345, 7, 220, false, false, true, false, 0, null );
              fireOnThis.dispatchEvent(evObj);
 
              //例子2 考虑兼容性的一个鼠标移动事件
@@ -1583,7 +1620,7 @@
                     //此处使用通用事件
                     evObj = document.createEvent('Events');
                     evObj.initEvent(type, false, true);
-                    if (oTarget instanceof jQuery) {
+                    if (Tool.judge.isjQuery(oTarget)) {
                         oTarget.each(function () {
                             dom = this;
                             dom.dispatchEvent(evObj);
@@ -1595,7 +1632,7 @@
                     }
                 }
                 else if (Tool.judge.isHostMethod(document, "createEventObject")) {
-                    if (oTarget instanceof jQuery) {
+                    if (Tool.judge.isjQuery(oTarget)) {
                         oTarget.each(function () {
                             dom = this;
                             dom.fireEvent('on' + type);
@@ -1754,7 +1791,7 @@
                     minuteStr = beginTimeStr.slice(2, 4);
 
                 /*如果beginTimeStr为数字如550，则可以用以下代码
-                 * 
+                 *
                  var tempNum = parseInt(beginTimeStr, 10) / 100;
                  hour = Math.floor(tempNum);
                  minute = Math.round(Tool.number.getDecimal(tempNum, 2) * 100);
@@ -1915,9 +1952,9 @@
                             return replaceMent + first;
                         });
                         break;
-                    case "first":   //替换第一个匹配项  
+                    case "first":   //替换第一个匹配项
                         str = matchStr;
-                        reg = new RegExp(str);  //使用RegExp对象来构造动态匹配  
+                        reg = new RegExp(str);  //使用RegExp对象来构造动态匹配
                         result = _source.replace(reg, replaceMent);
                         break;
                     default:    //替换指定位置的匹配项
@@ -1943,19 +1980,6 @@
             //去掉两边空白
             trim: function (info) {
                 return info.replace(/^\s*/, "").replace(/\s*$/, "");
-            },
-            // 将注释中的内容转换为多行字符串
-            // 示例：
-            // heredoc(function () {
-            // /*
-            // var a = {
-            // func: function () {
-            // }
-            // };
-            //*/
-            // });
-            heredoc: function (fn) {
-                return fn.toString().split('\n').slice(2, -2).join('\n') + '\n'
             }
         }
     }());
@@ -1964,10 +1988,19 @@
         return {
             //删除obj的成员member
             deleteMember: function (obj, member) {
-                //因为ie下使用delete有bug，所以用指定为undefined来代替：
-                //ie中（如ie8）使用delete删除全局属性（如“window.foo = 1;”中的foo），
-                //会抛出错误：“对象不支持此操作”！
-                obj[member] = undefined;
+                /* 它不会删除o.x指向的对象，而是删除o.x属性本身。
+                 示例：
+                 var o = {};
+                 o.x = new Object();
+                 delete o.x;     // 上一行new的Object对象依然存在
+                 o.x;            // undefined，o的名为x的属性被删除了
+                 在实际的Javascript中，delete o.x之后，Object对象会由于失去了引用而被垃圾回收， 所以delete o.x也就“相当于”删除了o.x所指向的对象，
+                 具有DontDelete的的属性不能被delete。例如，prototype中声明的属性就无法被delete
+
+                 delete是普通运算符，会返回true或false。规则为：当被delete的对象的属性存在并且拥有DontDelete时
+                 返回false，否则返回true。 这里的一个特点就是，对象属性不存在时也返回true，所以返回值并非完全等同于删除成功与否。
+                 */
+                delete obj[member];
             }
         };
     }());
@@ -2146,12 +2179,12 @@
              释放闭包
              */
             release: function (resource) {
-                $(window).unload(function () {
+                $(global).unload(function () {
                     if (resource) {
                         resource = null;
                     }
                     try {
-                        if (Tool.judge.browser.ie) {
+                        if (Tool.judge.browser.isIE()) {
                             CollectGarbage();   //强制回收,ie才有
                         }
                     }
@@ -2283,9 +2316,9 @@
                 };
 
                 // 如果浏览器支持 pageYOffset, 通过 pageXOffset 和 pageYOffset 获取页面和视窗之间的距离
-                if (typeof window.pageYOffset != 'undefined') {
-                    point.x = window.pageXOffset;
-                    point.y = window.pageYOffset;
+                if (typeof global.pageYOffset != 'undefined') {
+                    point.x = global.pageXOffset;
+                    point.y = global.pageYOffset;
                 }
                 // 如果浏览器支持 compatMode, 并且指定了 DOCTYPE, 通过 documentElement 获取滚动距离作为页面和视窗间的距离
                 // IE 中, 当页面指定 DOCTYPE, compatMode 的值是 CSS1Compat, 否则 compatMode 的值是 BackCompat
@@ -2508,8 +2541,28 @@
     }());
 
 
-    window[YToolConfig.topNamespace] = window[YToolConfig.topNamespace] || {};
+    // 支持AMD、CMD、CommonJS规范
+    // 支持通过script标签直接引用（Top的方法位于命名空间YYC中，Tool的方法位于命名空间YYC.Tool中）
 
-    Tool.extend.extend(window[YToolConfig.topNamespace], Top);
+    var hasDefine = typeof define === "function",
+        hasExports = typeof module !== 'undefined' && module.exports;
+
+    if (hasDefine || hasExports) {
+        Tool.object.deleteMember(Top, YToolConfig.toolNamespace);
+        Tool.extend.extend(Tool, Top);
+
+        if (hasDefine) {
+            define(function () {
+                return Tool;
+            });
+        }
+        else if (hasExports) {
+            module.exports = Tool;
+        }
+    }
+    else {
+        global[YToolConfig.topNamespace] = global[YToolConfig.topNamespace] || {};
+
+        Tool.extend.extend(global[YToolConfig.topNamespace], Top);
+    }
 }());
-

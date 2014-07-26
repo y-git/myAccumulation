@@ -36,7 +36,7 @@ describe("File API", function () {
 //                "b": {}
 //            };
 //
-//            file.doSave(YYC.Tool.convert.toString(a), "application/json", "hello.json");
+//            file.createFileAndDownload(YYC.Tool.convert.toString(a), "application/json", "hello.json");
 //        });
 //
 //    });

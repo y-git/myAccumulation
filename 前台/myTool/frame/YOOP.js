@@ -1,7 +1,7 @@
 ﻿/***********************************************
  OOP框架YOOP    v1.0
 
- 作者：YYC
+ 作者：YOOP
  日期：2013-06-09
  电子邮箱：395976266@qq.com
  QQ: 395976266
@@ -84,14 +84,14 @@
 
 
  2013.04.02:
- “extendDeep(F.prototype.backUp_prototype, F.prototype);”顺序错了，
- 应该为“extendDeep(F.prototype, F.prototype.backUp_prototype);”或“F.prototype.backUp_prototype = extendDeep(F.prototype);”。
+ “_extendDeep(F.prototype.backUp_prototype, F.prototype);”顺序错了，
+ 应该为“_extendDeep(F.prototype, F.prototype.backUp_prototype);”或“F.prototype.backUp_prototype = _extendDeep(F.prototype);”。
  已修正该顺序！
 
 
  2013.04.12:
  之前的顺序是对的。。。。。。（04.02）
- 恢复了原来的顺序：“extendDeep(F.prototype.backUp_prototype, F.prototype);”
+ 恢复了原来的顺序：“_extendDeep(F.prototype.backUp_prototype, F.prototype);”
 
 
  2013.04.14:
@@ -167,11 +167,11 @@
 
  2013.06.07
 
- YYC.AClass、YYC.Class增加“可以将虚方法定义在外面，表示公有虚方法”
+ YOOP.AClass、YOOP.Class增加“可以将虚方法定义在外面，表示公有虚方法”
 
- YYC.AClass不验证是否实现了接口，但是可以继承接口成员（可以交给子类Class来验证）。
+ YOOP.AClass不验证是否实现了接口，但是可以继承接口成员（可以交给子类Class来验证）。
 
- YYC.Interface、YYC.AClass、YYC.Class可以继承多个接口。
+ YOOP.Interface、YOOP.AClass、YOOP.Class可以继承多个接口。
 
  修改了buildClass、buildAClass、__getByParent传入的参数。
 
@@ -234,10 +234,14 @@
  2014.05.17
  修改stubParentMethod、stubParentMethodByAClass方法
 
+ 2014.07.16
+ 支持AMD、CMD、CommonJS规范，支持通过script标签直接引用（引入命名空间YYC）
+ 在seajs、nodejs和直接引用script中运行测试通过
+
  ************************************************/
 (function () {
-
-    window.YYC = window.YYC || {};
+    var global = this;
+    var YOOP = {};
 
     /************************************************** js对象扩展 ************************************************************/
     (function () {
@@ -255,7 +259,7 @@
 
         //获得在原型prototype中不存在同名的str。
         //如果有同名，则加上前缀"_"
-    function getNoRepeatStrInPrototype(prototype, str) {
+    function _getNoRepeatStrInPrototype(prototype, str) {
         var new_str = "";
 
         if (!prototype[str]) {
@@ -266,7 +270,7 @@
         return arguments.callee(prototype, new_str);
     }
 
-    function extendDeep(parent, child) {
+    function _extendDeep(parent, child) {
         var i = null,
             len = 0,
             toStr = Object.prototype.toString,
@@ -319,7 +323,16 @@
         return _child;
     }
 
-    function getFunctionName(fn) {
+    function _extend(destination, source) {
+        var property = "";
+
+        for (property in source) {
+            destination[property] = source[property];
+        }
+        return destination;
+    }
+
+    function _getFunctionName(fn) {
         var name = "";
 
         if (!fn) {
@@ -330,25 +343,25 @@
         return name === null ? name : name[1];
     }
 
-    function isArray(val) {
+    function _isArray(val) {
         return Object.prototype.toString.call(val) === "[object Array]";
     }
 
-    function initParentContainer(struct) {
+    function _initParentContainer(struct) {
         struct.yoop_parents = []
     }
 
-    function saveParents(struct, _inheritedInterfaces, _inheritedClasses) {
-        if (_inheritedInterfaces) {
-            struct.yoop_parents = struct.yoop_parents.concat(_inheritedInterfaces);
-            for (var i = 0, len = _inheritedInterfaces.length; i < len; i++) {
-                struct.yoop_parents = struct.yoop_parents.concat(_inheritedInterfaces[i].yoop_parents);
+    function _saveParents(struct, inheritedInterfaces, inheritedClasses) {
+        if (inheritedInterfaces) {
+            struct.yoop_parents = struct.yoop_parents.concat(inheritedInterfaces);
+            for (var i = 0, len = inheritedInterfaces.length; i < len; i++) {
+                struct.yoop_parents = struct.yoop_parents.concat(inheritedInterfaces[i].yoop_parents);
             }
         }
 
-        if (_inheritedClasses) {
-            struct.yoop_parents.push(_inheritedClasses);
-            struct.yoop_parents = struct.yoop_parents.concat(_inheritedClasses.yoop_parents);
+        if (inheritedClasses) {
+            struct.yoop_parents.push(inheritedClasses);
+            struct.yoop_parents = struct.yoop_parents.concat(inheritedClasses.yoop_parents);
         }
     }
 
@@ -375,7 +388,7 @@
             this.method = null;
             this.attribute = null;
 
-            initParentContainer(I);
+            _initParentContainer(I);
 
             function I() {
             }
@@ -383,10 +396,10 @@
             function _getByParent(_parent, _method, _attribute) {
                 if (_hasParent(_parent)) {
                     _checkInheritInterface(_parent);
-                    that.parent = isArray(_parent) ? _parent : [_parent];
+                    that.parent = _isArray(_parent) ? _parent : [_parent];
 
                     //形如“Interface(Parent, "A", "B", "GetName");”
-                    if (_method && !isArray(_method)) {
+                    if (_method && !_isArray(_method)) {
                         that.method = Array.prototype.slice.call(arguments, 1);
                         that.attribute = null;
                     }
@@ -399,7 +412,7 @@
                 else {
                     that.parent = null;
                     //形如“Interface("A", "B", "GetName");”
-                    if (_parent && !isArray(_parent)) {
+                    if (_parent && !_isArray(_parent)) {
                         that.method = Array.prototype.slice.call(arguments, 0);
                         that.attribute = null;
                     }
@@ -410,18 +423,18 @@
                     }
                 }
 
-                saveParents(I, that.parent);
+                _saveParents(I, that.parent);
                 _checkMethod();
             };
             function _hasParent(_parent) {
-                return typeof _parent === "function" || (isArray(_parent) && typeof _parent[0] === "function");
+                return typeof _parent === "function" || (_isArray(_parent) && typeof _parent[0] === "function");
             };
             function _checkInheritInterface(_parent) {
                 var i = 0,
                     len = 0;
 
                 for (i = 0, len = _parent.length; i < len; i++) {
-                    if (getFunctionName(_parent[i]) !== "I") {
+                    if (_getFunctionName(_parent[i]) !== "I") {
                         throw new Error("Interface must inherit interface!");
                     }
                 }
@@ -436,7 +449,7 @@
                     len = 0;
 
                 for (i = 0, len = that.parent.length; i < len; i++) {
-                    extendDeep(that.parent[i].prototype, I.prototype);
+                    _extendDeep(that.parent[i].prototype, I.prototype);
                 }
                 I.prototype.constructor = I;
             };
@@ -459,7 +472,7 @@
                     len = 0;
 
                 if (that.attribute) {
-                    if (!isArray(that.attribute)) {
+                    if (!_isArray(that.attribute)) {
                         throw new Error("Attribute must be array!");
                     }
                     else {
@@ -483,7 +496,7 @@
             };
         };
 
-        YYC.Interface = function (_parent, _method, _attribute) {
+        YOOP.Interface = function (_parent, _method, _attribute) {
             return new Interface().buildInterface(_parent, _method, _attribute);
         };
     }());
@@ -679,15 +692,15 @@
                          *  不使用“_class.prototype = new parentClass()”来继承，
                          *  因为这样会在创建类时（调用YYC.Class）调用父类的构造函数！
                          *  而用户期望的是在创建实例时
-                         *  （var B = YYC.Class(A, {});  实际上会在此处就调用A的构造函数！
+                         *  （var B = YOOP.Class(A, {});  实际上会在此处就调用A的构造函数！
                          *  var b = new B();    期望此处调用A的构造函数
                          *  ）
                          *  才调用父类的构造函数！
                          */
-                        _class.prototype = extendDeep(parentClass.prototype);
+                        _class.prototype = _extendDeep(parentClass.prototype);
 //                    _class.prototype = new parentClass();
 //                    _class.prototype = parentClass.prototype;
-//                    extendDeep(parentClass.prototype, _class.prototype);
+//                    _extendDeep(parentClass.prototype, _class.prototype);
 
 //                    var F = function(){};
 //                    F.prototype = parentClass.prototype;
@@ -711,7 +724,7 @@
                         // 如果父类存在，则实例对象的baseClass指向父类的原型。
                         // 这就提供了在实例对象中调用父类方法的途径。
                         //baseClass的方法是指向this.parentClass.prototype的，不是指向（子类）的！
-                        _class.prototype[getNoRepeatStrInPrototype(parentClass.prototype, "baseClass")] = parentClass.prototype;
+                        _class.prototype[_getNoRepeatStrInPrototype(parentClass.prototype, "baseClass")] = parentClass.prototype;
 //addBaseClass(_class, "baseClass", parentClass.prototype);
                     }
                 },
@@ -804,7 +817,7 @@
             this.interface = null;
             this.prop = null;
 
-            initParentContainer(A);
+            _initParentContainer(A);
 
             // 创建的类（构造函数）
             function A() {
@@ -827,7 +840,7 @@
                         throw new Error("Please add AbstractClass or Interface!");
                     }
                     that.parentClass = _parent.Class;
-                    if (isArray(_parent.Interface)) {
+                    if (_isArray(_parent.Interface)) {
                         that.interface = _parent.Interface;
                     }
                     else if (typeof _parent.Interface === "function") {
@@ -848,7 +861,7 @@
                     throw new Error("AbstractClass can't inherit class!");
                 }
 
-                saveParents(A, that.interface, that.parentClass);
+                _saveParents(A, that.interface, that.parentClass);
             };
             function _checkOnlyOneParentClass(args) {
                 if (args.length >= 3) {
@@ -856,13 +869,13 @@
                 }
 
                 if (args[0].Class) {
-                    if (isArray(args[0].Class) && args[0].Class.length >= 2) {
+                    if (_isArray(args[0].Class) && args[0].Class.length >= 2) {
                         throw new Error("AbstractClass can only inherit from one parentClass");
                     }
                 }
             };
             function _isInheritFromClass() {
-                return getFunctionName(that.parentClass) === "F";
+                return _getFunctionName(that.parentClass) === "F";
             };
             this.P_inheritInterface = function () {
                 if (this.interface) {
@@ -870,7 +883,7 @@
                         len = 0;
 
                     for (i = 0, len = this.interface.length; i < len; i++) {
-                        extendDeep(this.interface[i].prototype, A.prototype);
+                        _extendDeep(this.interface[i].prototype, A.prototype);
                     }
                 }
             };
@@ -935,7 +948,7 @@
             //当前是否处于创建类的阶段。
             this.initializing = false;
 
-            initParentContainer(F);
+            _initParentContainer(F);
 
             // 创建的类（构造函数）
             function F() {
@@ -943,7 +956,7 @@
                     args = arguments;
 
                 function _copyPrototypeToInstance() {
-                    extendDeep(F.prototype, self);
+                    _extendDeep(F.prototype, self);
                     //F.prototype.baseClass的constructor为自带的属性，因此extendDeep中的for不会遍历到F.prototype.baseClass.constructor
                     //因此该属性不会复制到self中，需要进行手动复制
                     if (self.baseClass) {
@@ -1060,7 +1073,7 @@
                         throw new Error("Please add Class or Interface!");
                     }
                     that.parentClass = _parent.Class;
-                    if (isArray(_parent.Interface)) {
+                    if (_isArray(_parent.Interface)) {
                         that.interface = _parent.Interface;
                     }
                     else if (typeof _parent.Interface === "function") {
@@ -1078,7 +1091,7 @@
                     throw new Error("arguments is not allowed!");
                 }
 
-                saveParents(F, that.interface, that.parentClass);
+                _saveParents(F, that.interface, that.parentClass);
             };
             function _checkOnlyOneParentClass(args) {
                 if (args.length >= 3) {
@@ -1086,7 +1099,7 @@
                 }
 
                 if (args[0].Class) {
-                    if (isArray(args[0].Class) && args[0].Class.length >= 2) {
+                    if (_isArray(args[0].Class) && args[0].Class.length >= 2) {
                         throw new Error("class can only inherit from one parentClass");
                     }
                 }
@@ -1180,19 +1193,38 @@
          调用YYC.AClass时，只是引用该实例的buildAClass，而不会再创建AClass实例。
          也就是说，所有YYC.AClass都共用一个AClass的实例！共用AClass实例的属性（如parent等）！
 
-         YYC.AClass = new AClass().buildAClass;
+         YOOP.AClass = new AClass().buildAClass;
          */
 
 
-        YYC.AClass = function () {
+        YOOP.AClass = function () {
             return new AClass().buildAClass(arguments);
         };
-        YYC.Class = function () {
+        YOOP.Class = function () {
             return new Class().buildClass(arguments);
         };
-    }
+    }());
 
-        ()
-        )
-    ;
+
+    // 支持AMD、CMD、CommonJS规范
+    // 支持通过script标签直接引用（引入命名空间YYC）
+
+    var hasDefine = typeof define === "function",
+        hasExports = typeof module !== 'undefined' && module.exports;
+
+    if (hasDefine || hasExports) {
+        if (hasDefine) {
+            define(function () {
+                return YOOP;
+            });
+        }
+        else if (hasExports) {
+            module.exports = YOOP;
+        }
+    }
+    else {
+        global.YYC = global.YYC || {};
+
+        _extend(global.YYC, YOOP);
+    }
 }());

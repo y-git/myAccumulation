@@ -156,7 +156,7 @@ YYC.namespace("Tool").select = (function () {
                 //                var array = operate.Clone(array);
 
                 //ff下select需要刷新
-                if (YYC.Tool.judge.browser.ff) {
+                if (YYC.Tool.judge.browser.isFF()) {
                     YYC.Tool.select.selectNone(id);
                 }
 

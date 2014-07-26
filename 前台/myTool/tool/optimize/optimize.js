@@ -12,7 +12,7 @@ YYC.namespace("Tool").optimize = (function () {
                     resource = null;
                 }
                 try {
-                    if (YYC.Tool.judge.browser.ie) {
+                    if (YYC.Tool.judge.browser.isIE()) {
                         CollectGarbage();   //强制回收,ie才有
                     }
                 }

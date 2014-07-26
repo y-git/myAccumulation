@@ -7,11 +7,11 @@
  */
 (function () {
     namespace("YE").Config = {
-        //A*算法设置
-        algorithm: {
-            //有几个方向
-            DIRECTION: 4
-        },
+//        //A*算法设置
+//        algorithm: {
+//            //有几个方向
+//            DIRECTION: 4
+//        },
 
 
         //*调试配置

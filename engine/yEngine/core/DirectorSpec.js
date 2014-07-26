@@ -107,11 +107,11 @@ describe("Director", function () {
         });
     });
 
-    describe("setLoopInterval", function () {
+    describe("setLoopIntervalAndRestart", function () {
         it("设置主循环的间隔时间", function () {
             var interval = 100;
 
-            director.setLoopInterval(interval);
+            director.setLoopIntervalAndRestart(interval);
 
             expect(director.ye_loopInterval).toEqual(interval);
         });
@@ -119,7 +119,7 @@ describe("Director", function () {
             sandbox.stub(director, "ye_endLoop");
             sandbox.stub(director, "ye_startLoop");
 
-            director.setLoopInterval();
+            director.setLoopIntervalAndRestart();
 
             expect(director.ye_endLoop.calledOnce).toBeTruthy();
             expect(director.ye_startLoop.calledAfter(director.ye_endLoop)).toBeTruthy();
@@ -133,7 +133,7 @@ describe("Director", function () {
 
             director.resumeRequestAnimFrameLoop();
 
-            expect(director.ye_loopInterval).toEqual(director.ye_STARTING_FPS);
+            expect(director.ye_loopInterval).toEqual(1 / director.ye_STARTING_FPS);
             expect(director.ye_endLoop.calledOnce).toBeTruthy();
             expect(director.ye_startLoop.calledAfter(director.ye_endLoop)).toBeTruthy();
         });
@@ -227,7 +227,7 @@ describe("Director", function () {
 
         beforeEach(function () {
             fakeScene = sandbox.createSpyObj("run", "startLoop", "endLoop", "");
-            director.ye_currentScene =  fakeScene;
+            director.ye_currentScene = fakeScene;
             sandbox.stub()
         });
 
@@ -246,21 +246,21 @@ describe("Director", function () {
             });
         });
 
-        it("调用场景的startLoop",function(){
+        it("调用场景的startLoop", function () {
             director.ye_loopBody();
 
             expect(fakeScene.startLoop.calledOnce).toBeTruthy();
-        })  ;
+        });
         it("启动当前场景", function () {
             director.ye_loopBody();
 
             expect(fakeScene.run.calledOnce).toBeTruthy();
         });
-        it("调用场景的endLoop",function(){
+        it("调用场景的endLoop", function () {
             director.ye_loopBody();
 
             expect(fakeScene.endLoop.calledOnce).toBeTruthy();
-        })  ;
+        });
     });
 
     describe("getFps", function () {

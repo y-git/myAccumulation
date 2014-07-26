@@ -244,7 +244,7 @@
                 "a": 1,
                 "b": {}
             };
-         doSave(YYC.Tool.convert.toString(a), "application/json", "hello.json");
+         createFileAndDownload(YYC.Tool.convert.toString(a), "application/json", "hello.json");
 
 
          *  Array parts:一个数组,包含了将要添加到Blob对象中的数据.
@@ -252,9 +252,9 @@
          *
          *  var blob = new Blob( Array parts);
          *
-         *  doSave(blob, "hello.json");
+         *  createFileAndDownload(blob, "hello.json");
          */
-        doSave: function (args) {
+        createFileAndDownload: function (args) {
             var blob = null,
                 name = null,
                 value = null,

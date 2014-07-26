@@ -73,7 +73,7 @@
                         break;
                 }
 
-                if (mimeType == 'mp3' && YE.Tool.judge.browser.ff) {
+                if (mimeType == 'mp3' && YE.Tool.judge.browser.isFF()) {
                     return false;
                 }
 
@@ -106,6 +106,21 @@
 //                audio.preload = 'auto';
 //                audio.autobuffer = true;
 
+                /*Audio still doesn't work consistently across all browsers, as of right now:
+
+                 An element must be reloaded in Chrome or it will only play once
+                 An element must not be reloaded in Firefox or there will be a delay*/
+                this._audio.addEventListener("ended", function () {
+                    if (YE.Tool.judge.browser.isChrome()) {
+                        this.load();
+                    }
+                    else if (YE.Tool.judge.browser.isFF()) {
+                        this.currentTime = 0;
+                    }
+                    else {
+                        YE.error(true, "目前仅支持chrome、firefox浏览器");
+                    }
+                }, false);
 
                 this._load();
 

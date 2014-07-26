@@ -49,23 +49,23 @@ describe("jasmine", function () {
         //        };
 
 
-       // it("spyOn能够监视变量", function () {
-       //     var foo = {
-       //         a: null
-       //     };
+        // it("spyOn能够监视变量", function () {
+        //     var foo = {
+        //         a: null
+        //     };
 
-       //     spyOn(foo, "a");
+        //     spyOn(foo, "a");
 
-       //     a = {
-       //         act: function () {
-       //         }
-       //     };
+        //     a = {
+        //         act: function () {
+        //         }
+        //     };
 
-       //     foo.a.act();
+        //     foo.a.act();
 
-       //     expect(function () {
-       //         expect(foo.a.act).toHaveBeenCalled();
-       //     }).toThrow("foo.a.act is not a function");
+        //     expect(function () {
+        //         expect(foo.a.act).toHaveBeenCalled();
+        //     }).toThrow("foo.a.act is not a function");
         //});
 
 
@@ -141,7 +141,8 @@ describe("jasmine", function () {
                 spyOn(foo, "notExist").andReturn("");
             };
             var func3 = function () {
-                spyOn(foo, "notExist").andCallFake(function () { });
+                spyOn(foo, "notExist").andCallFake(function () {
+                });
             };
 
             expect(func1).toThrow();
@@ -156,7 +157,8 @@ describe("jasmine", function () {
                 spyOn(no, "notExist").andReturn("");
             };
             var func3 = function () {
-                spyOn(no, "notExist").andCallFake(function () { });
+                spyOn(no, "notExist").andCallFake(function () {
+                });
             };
 
             expect(func1).toThrow();
@@ -344,7 +346,7 @@ describe("jasmine", function () {
 
             expect(t).toEqual(100);
 
-            testTool.delete(foo, "set");
+            testTool.deleteAttribute(foo, "set");
         });
     });
 
@@ -454,31 +456,38 @@ describe("jasmine", function () {
             it("调用tool方法（封装waitsFor、runs），实现异步测试", function () {
                 /*
 
-                    //*延迟100ms后，执行“Game.init();”。
-                    //*然后再延迟100ms后，执行“expect(Game.context.createPattern.calls.length).toEqual(1);”
+                 //*延迟100ms后，执行“Game.init();”。
+                 //*然后再延迟100ms后，执行“expect(Game.context.createPattern.calls.length).toEqual(1);”
 
-                    testTool.asynRun(function () {
-                        Game.init();
-                    }, 100);
-                    testTool.asynRun(function () {
-                        expect(Game.context.createPattern.calls.length).toEqual(1);
-                    }, 100);
+                 testTool.asynRun(function () {
+                 Game.init();
+                 }, 100);
+                 testTool.asynRun(function () {
+                 expect(Game.context.createPattern.calls.length).toEqual(1);
+                 }, 100);
 
 
 
-                详见showMapSpec.js，参考调用代码：
+                 详见showMapSpec.js，参考调用代码：
 
-                it("隐藏加载进度条", function () {
-                    expect($("#progressBar").css("display")).toEqual("block");
-                    Game.init();
+                 it("隐藏加载进度条", function () {
+                 expect($("#progressBar").css("display")).toEqual("block");
+                 Game.init();
 
-                    //延迟500ms测试
-                    testTool.asynRun(function () {
-                        expect($("#progressBar").css("display")).toEqual("none");
-                    }, 500);
-                });
-                */
+                 //延迟500ms测试
+                 testTool.asynRun(function () {
+                 expect($("#progressBar").css("display")).toEqual("none");
+                 }, 500);
+                 });
+                 */
             });
         });
     });
+
+    describe("toContain", function () {
+        it("参数为RegExp构造函数参数，进行正则判断是否match", function () {
+            expect("1+2").toContain("1\\+2");
+        });
+    });
+
 });

@@ -10,8 +10,8 @@ describe("YSoundEngine", function () {
     var sandbox = null;
 
     beforeEach(function () {
-        engine = new YE.YSoundEngine();
         sandbox = sinon.sandbox.create();
+        engine = new YE.YSoundEngine();
     });
     afterEach(function () {
         sandbox.restore();
@@ -61,10 +61,51 @@ describe("YSoundEngine", function () {
                     engine.initWhenCreate({
                         onload: fakeOnload
                     });
-
                     fakeSound.addEventListener.firstCall.callArgOn(1, fakeSound);
+
                     expect(fakeSound.addEventListener.firstCall.args[0]).toEqual("canplaythrough");
                     expect(fakeOnload.call.args[0]).toEqual([engine, null]);
+                });
+
+                describe("绑定ended事件，重置声音位置", function () {
+                    beforeEach(function () {
+                        fakeSound.load = sandbox.stub();
+                    });
+
+                    it("绑定ended事件", function () {
+                        engine.initWhenCreate({});
+
+                        expect(fakeSound.addEventListener.thirdCall.args[0]).toEqual("ended");
+                    });
+                    it("chrome下调用load方法", function () {
+                        sandbox.stub(YE.Tool.judge.browser, "isChrome").returns(true);
+
+                        engine.initWhenCreate({});
+                        fakeSound.addEventListener.thirdCall.callArgOn(1, fakeSound);
+
+                        expect(fakeSound.load.calledOnce).toBeTruthy();
+                    });
+                    it("firefox下重置currentTime属性", function () {
+                        sandbox.stub(YE.Tool.judge.browser, "isChrome").returns(false);
+                        sandbox.stub(YE.Tool.judge.browser, "isFF").returns(true);
+                        fakeSound.currentTime = 100;
+
+                        engine.initWhenCreate({});
+                        fakeSound.addEventListener.thirdCall.callArgOn(1, fakeSound);
+
+                        expect(fakeSound.currentTime).toEqual(0);
+                    });
+                    it("其它浏览器下则报错", function () {
+                        sandbox.stub(YE.Tool.judge.browser, "isChrome").returns(false);
+                        sandbox.stub(YE.Tool.judge.browser, "isFF").returns(false);
+                        sandbox.stub(YE.Tool.judge.browser, "isIE").returns(true);
+                        sandbox.stub(YE, "error");
+
+                        engine.initWhenCreate({});
+                        fakeSound.addEventListener.thirdCall.callArg(1);
+
+                        expect(YE.error.calledOnce).toBeTruthy();
+                    });
                 });
                 it("绑定onerror到error事件，使其this指向engine，传入errorCode", function () {
                     var fakeOnerror = sandbox.createSpyObj("call");
@@ -106,9 +147,7 @@ describe("YSoundEngine", function () {
             });
 
             it("如果浏览器为firefox，则它不支持mp3格式的声音文件", function () {
-                sandbox.stub(YE.Tool.judge, "browser", {
-                    ff: true
-                });
+                sandbox.stub(YE.Tool.judge.browser, "isFF").returns(true);
                 sandbox.stub(window, "Audio").returns({
                     canPlayType: sandbox.stub().returns(true)
                 });
@@ -121,9 +160,7 @@ describe("YSoundEngine", function () {
                 var fakeAudio = {
                     canPlayType: sandbox.stub()
                 };
-                sandbox.stub(YE.Tool.judge, "browser", {
-                    ff: false
-                });
+                sandbox.stub(YE.Tool.judge.browser, "isFF").returns(false);
                 sandbox.stub(window, "Audio").returns(fakeAudio);
                 fakeAudio.canPlayType.onCall(0).returns("");
                 fakeAudio.canPlayType.onCall(1).returns("maybe");
