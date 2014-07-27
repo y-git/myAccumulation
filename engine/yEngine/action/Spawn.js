@@ -74,7 +74,7 @@ namespace("YE").Spawn = YYC.Class(YE.ActionInterval, {
             this.ye___iterator("start");
         },
         copy: function () {
-            var spawn = this.forTest_getInstance(YE.Tool.extend.extendDeep(this.ye___one.concat([this.ye___two])));
+            var spawn = this.forTest_getInstance(YYC.Tool.extend.extendDeep(this.ye___one.concat([this.ye___two])));
 
             return spawn;
         },

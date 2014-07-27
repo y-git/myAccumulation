@@ -237,7 +237,9 @@ describe("Sequence", function () {
 
         it("如果参数小于2，则断言", function () {
             var sandbox = sinon.sandbox.create();
-            sandbox.stub(YE.Config, "DEBUG", true);
+            sandbox.stub(YE.main, "getConfig").returns({
+                debug:true
+            });
 
             expect(function () {
                 YE.Sequence.create(buildFakeAction());

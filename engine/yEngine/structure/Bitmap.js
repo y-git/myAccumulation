@@ -43,7 +43,7 @@
             copy: function () {
                 var bitmap = YE.Bitmap.create(this.img);
 
-                YE.Tool.extend.extend(bitmap, this);
+                YYC.Tool.extend.extend(bitmap, this);
 
                 return bitmap;
             }

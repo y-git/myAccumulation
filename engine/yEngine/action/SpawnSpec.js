@@ -23,8 +23,8 @@ describe("Spawn", function () {
     }
 
     beforeEach(function () {
-        action = YE.Spawn.create();
         sandbox = sinon.sandbox.create();
+        action = YE.Spawn.create();
     });
     afterEach(function () {
         sandbox.restore();
@@ -154,11 +154,11 @@ describe("Spawn", function () {
         });
 
         it("动作序列要进行拷贝", function () {
-            sandbox.stub(YE.Tool.extend, "extendDeep");
+            sandbox.stub(YYC.Tool.extend, "extendDeep");
 
             var c = action.copy();
 
-            expect(YE.Tool.extend.extendDeep.calledWith(one.concat([two]))).toBeTruthy();
+            expect(YYC.Tool.extend.extendDeep.calledWith(one.concat([two]))).toBeTruthy();
         });
         it("返回动作副本", function () {
             var c = action.copy();
@@ -168,21 +168,14 @@ describe("Spawn", function () {
     });
 
     describe("create", function () {
-        var fake1 = {},
-            fake2 = {
-                a: 1
-            }       ,
-            fake3 = {
-                b: 2
-            };
-
         beforeEach(function () {
-            YE.Config.DEBUG = false;
         });
 
         it("如果参数小于2，则断言", function () {
             var sandbox = sinon.sandbox.create();
-            sandbox.stub(YE.Config, "DEBUG", true);
+            sandbox.stub(YE.main, "getConfig").returns({
+                debug: true
+            });
 
             expect(function () {
                 YE.Spawn.create({});
@@ -199,13 +192,6 @@ describe("Spawn", function () {
         it("创建实例并返回", function () {
             expect(YE.Spawn.create({})).toBeInstanceOf(YE.Spawn);
         });
-//        it("获得动作的副本", function () {
-//            action = YE.Spawn.create(fake1, fake2, fake3);
-//
-//            action.ye___actions[0].c = {};
-//
-//            expect(fake1.c).toBeUndefined();
-//        });
         it("初始化动作", function () {
         });
     })

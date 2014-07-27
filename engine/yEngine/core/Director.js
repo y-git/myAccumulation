@@ -126,7 +126,7 @@
                 return this.ye_fps;
             },
             getPixPerFrame: function (speed) {
-                if (YE.Config.DEBUG) {
+                if (YE.main.getConfig().debug) {
                     return speed / this.ye_STARTING_FPS;
                 }
 
@@ -135,7 +135,7 @@
             end: function () {
                 this.ye_endLoop();
                 this.ye_gameStatus = GameStatus.END;
-                YE.Tool.asyn.clearAllTimer(this.ye_timerIndex);
+                YYC.Tool.asyn.clearAllTimer(this.ye_timerIndex);
             },
             pause: function () {
                 if (this.ye_gameStatus === GameStatus.PAUSE) {

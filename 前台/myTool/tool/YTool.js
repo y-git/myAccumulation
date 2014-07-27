@@ -238,10 +238,7 @@
                 return $(children).parents(parentSelector).length >= 1
             }
         }
-    }
-        ()
-        )
-    ;
+    }() );
     /**
      * 转换类型
      */

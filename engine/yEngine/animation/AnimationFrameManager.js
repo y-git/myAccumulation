@@ -20,7 +20,7 @@ namespace("YE").AnimationFrameManager = YYC.Class(YE.Entity, {
         initAndReturnAnim: function (animName, spriteData) {
             var anim = null;
 
-            if (YE.Tool.judge.isString(arguments[0])) {
+            if (YYC.Tool.judge.isString(arguments[0])) {
                 anim = this.getAnim(arguments[0]);
             }
             else {

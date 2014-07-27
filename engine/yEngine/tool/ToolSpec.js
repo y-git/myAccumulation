@@ -6,7 +6,6 @@
  * 博客：http://www.cnblogs.com/chaogex/
  */
 describe("Tool.js", function () {
-    var tool = YE.Tool;
     var sandbox = null;
 
     beforeEach(function () {
@@ -40,7 +39,9 @@ describe("Tool.js", function () {
         describe("assert", function () {
             describe("如果配置为调试状态", function () {
                 beforeEach(function () {
-                    sandbox.stub(YE.Config, "DEBUG", true);
+                    sandbox.stub(YE.main, "getConfig").returns({
+                        debug: true
+                    });
                 });
 
 

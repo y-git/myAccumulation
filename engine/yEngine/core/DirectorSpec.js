@@ -271,7 +271,9 @@ describe("Director", function () {
         it("如果处于调试状态，则fps为固定的ye_STARTING_FPS", function () {
             var fps = 60;
             var sandbox = sinon.sandbox.create();
-            sandbox.stub(YE.Config, "DEBUG", true);
+            sandbox.stub(YE.main, "getConfig").returns({
+                debug:true
+            });
             director.ye_STARTING_FPS = fps;
 
             expect(director.getPixPerFrame(1)).toEqual(1 / director.ye_STARTING_FPS);
@@ -280,7 +282,9 @@ describe("Director", function () {
         });
         it("否则，计算精灵每帧移动的距离（单位为像素pix）。距离=精灵每秒移动像素值（即速度）*每一帧持续的秒数（即1/fps）", function () {
             var sandbox = sinon.sandbox.create();
-            sandbox.stub(YE.Config, "DEBUG", false);
+            sandbox.stub(YE.main, "getConfig").returns({
+                debug:false
+            });
             director.ye_fps = 10;
 
             expect(director.getPixPerFrame(2)).toEqual(0.2);
@@ -304,12 +308,12 @@ describe("Director", function () {
         });
         it("停止所有计时器", function () {
             var index = 10;
-            sandbox.stub(YE.Tool.asyn, "clearAllTimer");
+            sandbox.stub(YYC.Tool.asyn, "clearAllTimer");
             director.setTimerIndex(index);
 
             director.end();
 
-            expect(YE.Tool.asyn.clearAllTimer.calledWith(index)).toBeTruthy();
+            expect(YYC.Tool.asyn.clearAllTimer.calledWith(index)).toBeTruthy();
         });
     });
 

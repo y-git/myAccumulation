@@ -33,7 +33,7 @@ namespace("YE").Entity = YYC.AClass({
             return this.ye_entity_uid;
         },
         setTag: function (tag) {
-            if (YE.Tool.judge.isArray(tag)) {
+            if (YYC.Tool.judge.isArray(tag)) {
                 this.ye_entity_tag = tag;
             }
             else {

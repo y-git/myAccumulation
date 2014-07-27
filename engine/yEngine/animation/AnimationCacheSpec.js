@@ -79,11 +79,11 @@ describe("AnimationCache", function () {
                 });
                 it("获得config", function () {
                     var frameData = {frames: [], a: 1, b: {}};
-                    sandbox.stub(YE.Tool.extend, "extendExist");
+                    sandbox.stub(YYC.Tool.extend, "extendExist");
 
                     cache.createAnim(frameData);
 
-                    expect(YE.Tool.extend.extendExist.callsArgWith(1, frameData)).toBeTruthy();
+                    expect(YYC.Tool.extend.extendExist.callsArgWith(1, frameData)).toBeTruthy();
                 });
             });
 
@@ -104,11 +104,11 @@ describe("AnimationCache", function () {
                 });
                 it("获得config", function () {
                     var config = {};
-                    sandbox.stub(YE.Tool.extend, "extend");
+                    sandbox.stub(YYC.Tool.extend, "extend");
 
                     cache.createAnim("aaa", config);
 
-                    expect(YE.Tool.extend.extend.callsArgWith(1, config)).toBeTruthy();
+                    expect(YYC.Tool.extend.extend.callsArgWith(1, config)).toBeTruthy();
                 });
             });
 

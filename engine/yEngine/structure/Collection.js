@@ -21,7 +21,7 @@
             hasChild: function (child) {
                 var func = null;
 
-                if (YE.Tool.judge.isFunction(arguments[0])) {
+                if (YYC.Tool.judge.isFunction(arguments[0])) {
                     func = arguments[0];
 
                     return this.ye_childs.contain(function (c, i) {
@@ -54,7 +54,7 @@
                 var i = 0,
                     len = 0;
 
-                if (!YE.Tool.judge.isArray(childs)) {
+                if (!YYC.Tool.judge.isArray(childs)) {
                     this.addChild(childs);
                 }
                 else {
@@ -99,7 +99,7 @@
                 var args = Array.prototype.slice.call(arguments, 1);
                 var nextElement = null;
 
-                if (YE.Tool.judge.isFunction(arguments[0])) {
+                if (YYC.Tool.judge.isFunction(arguments[0])) {
                     var func = arguments[0];
 
                     while (this.hasNext()) {
@@ -125,13 +125,13 @@
                 this.ye_childs.splice(index, 1);
             },
             copy: function () {
-                return YE.Tool.extend.extendDeep(this.ye_childs);
+                return YYC.Tool.extend.extendDeep(this.ye_childs);
             },
             reverse: function () {
                 this.ye_childs.reverse();
             },
             remove: function (obj, target) {
-                if (YE.Tool.judge.isFunction(obj)) {
+                if (YYC.Tool.judge.isFunction(obj)) {
                     return this.ye_childs.remove(obj, target);
                 }
                 else if (obj.isInstanceOf && obj.isInstanceOf(YE.Entity)) {

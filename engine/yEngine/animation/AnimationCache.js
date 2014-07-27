@@ -49,7 +49,7 @@
 
                 if (arguments.length === 1) {
                     frames = arguments[0].frames;
-                    YE.Tool.extend.extendExist(_config, arguments[0]);
+                    YYC.Tool.extend.extendExist(_config, arguments[0]);
 
                     frames.forEach(function (frame) {
                         animFrames.push(YE.FrameCache.getInstance().getFrame(frame));
@@ -57,7 +57,7 @@
                 }
                 else if (arguments.length === 2) {
                     animFrames = [YE.FrameCache.getInstance().getFrame(arguments[0])];
-                    YE.Tool.extend.extend(_config, arguments[1]);
+                    YYC.Tool.extend.extend(_config, arguments[1]);
                 }
                 else if (arguments.length === 3) {
                     startIndex = startFrameName.substring(startFrameName.search(/\d+$/), startFrameName.length);
@@ -73,7 +73,7 @@
                         animFrames.push(YE.FrameCache.getInstance().getFrame(this.ye_buildFrameName(animPrex, numberLen, i)));
                     }
 
-                    YE.Tool.extend.extend(_config, config);
+                    YYC.Tool.extend.extend(_config, config);
                 }
 
                 animation = YE.Animation.create(animFrames, {

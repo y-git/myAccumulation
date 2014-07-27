@@ -19,7 +19,7 @@ describe("YSoundEngine", function () {
 
     describe("initWhenCreate", function () {
         beforeEach(function () {
-            sandbox.stub(engine, "_load");
+            sandbox.stub(engine, "ye_load");
         });
 
         it("如果浏览器不支持Audio对象，则提示并返回", function () {
@@ -78,7 +78,7 @@ describe("YSoundEngine", function () {
                         expect(fakeSound.addEventListener.thirdCall.args[0]).toEqual("ended");
                     });
                     it("chrome下调用load方法", function () {
-                        sandbox.stub(YE.Tool.judge.browser, "isChrome").returns(true);
+                        sandbox.stub(YYC.Tool.judge.browser, "isChrome").returns(true);
 
                         engine.initWhenCreate({});
                         fakeSound.addEventListener.thirdCall.callArgOn(1, fakeSound);
@@ -86,8 +86,8 @@ describe("YSoundEngine", function () {
                         expect(fakeSound.load.calledOnce).toBeTruthy();
                     });
                     it("firefox下重置currentTime属性", function () {
-                        sandbox.stub(YE.Tool.judge.browser, "isChrome").returns(false);
-                        sandbox.stub(YE.Tool.judge.browser, "isFF").returns(true);
+                        sandbox.stub(YYC.Tool.judge.browser, "isChrome").returns(false);
+                        sandbox.stub(YYC.Tool.judge.browser, "isFF").returns(true);
                         fakeSound.currentTime = 100;
 
                         engine.initWhenCreate({});
@@ -96,9 +96,9 @@ describe("YSoundEngine", function () {
                         expect(fakeSound.currentTime).toEqual(0);
                     });
                     it("其它浏览器下则报错", function () {
-                        sandbox.stub(YE.Tool.judge.browser, "isChrome").returns(false);
-                        sandbox.stub(YE.Tool.judge.browser, "isFF").returns(false);
-                        sandbox.stub(YE.Tool.judge.browser, "isIE").returns(true);
+                        sandbox.stub(YYC.Tool.judge.browser, "isChrome").returns(false);
+                        sandbox.stub(YYC.Tool.judge.browser, "isFF").returns(false);
+                        sandbox.stub(YYC.Tool.judge.browser, "isIE").returns(true);
                         sandbox.stub(YE, "error");
 
                         engine.initWhenCreate({});
@@ -124,14 +124,14 @@ describe("YSoundEngine", function () {
             it("加载声音", function () {
                 engine.initWhenCreate({url: ["../a.mpe"]});
 
-                expect(engine._load.calledOnce).toBeTruthy();
+                expect(engine.ye_load.calledOnce).toBeTruthy();
             });
         });
     });
 
-    describe("_load", function () {
+    describe("ye_load", function () {
         beforeEach(function () {
-            engine._audio = {
+            engine.ye_audio = {
                 src: null
             };
         });
@@ -141,50 +141,50 @@ describe("YSoundEngine", function () {
 
             beforeEach(function () {
                 fakeUrlArr = ["../a.mp3", "../a.wav"];
-                engine._urlArr = fakeUrlArr;
+                engine.ye_urlArr = fakeUrlArr;
             });
             afterEach(function () {
             });
 
             it("如果浏览器为firefox，则它不支持mp3格式的声音文件", function () {
-                sandbox.stub(YE.Tool.judge.browser, "isFF").returns(true);
+                sandbox.stub(YYC.Tool.judge.browser, "isFF").returns(true);
                 sandbox.stub(window, "Audio").returns({
                     canPlayType: sandbox.stub().returns(true)
                 });
 
-                engine._load();
+                engine.ye_load();
 
-                expect(engine._audio.src).toEqual(fakeUrlArr[1]);
+                expect(engine.ye_audio.src).toEqual(fakeUrlArr[1]);
             });
             it("其它浏览器则根据canPlayType方法来判断", function () {
                 var fakeAudio = {
                     canPlayType: sandbox.stub()
                 };
-                sandbox.stub(YE.Tool.judge.browser, "isFF").returns(false);
+                sandbox.stub(YYC.Tool.judge.browser, "isFF").returns(false);
                 sandbox.stub(window, "Audio").returns(fakeAudio);
                 fakeAudio.canPlayType.onCall(0).returns("");
                 fakeAudio.canPlayType.onCall(1).returns("maybe");
 
-                engine._load();
+                engine.ye_load();
 
-                expect(engine._audio.src).toEqual(fakeUrlArr[1]);
+                expect(engine.ye_audio.src).toEqual(fakeUrlArr[1]);
             });
         });
 
         it("设置声音的加载路径", function () {
             var fakeUrl = "../a.mp3";
-            sandbox.stub(engine, "_getCanPlayUrl").returns(fakeUrl);
+            sandbox.stub(engine, "ye_getCanPlayUrl").returns(fakeUrl);
 
-            engine._load();
+            engine.ye_load();
 
-            expect(engine._audio.src).toEqual(fakeUrl);
+            expect(engine.ye_audio.src).toEqual(fakeUrl);
         });
     });
 
     describe("play", function () {
         it("播放声音", function () {
             var fakeAudio = sandbox.createSpyObj("play");
-            sandbox.stub(engine, "_audio", fakeAudio);
+            sandbox.stub(engine, "ye_audio", fakeAudio);
 
             engine.play();
 

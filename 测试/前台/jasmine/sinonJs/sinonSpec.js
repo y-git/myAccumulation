@@ -174,7 +174,7 @@ describe("测试SinonJs", function () {
             expect(t.done()).toEqual(20);
             expect(t.done()).toEqual(30);
         });
-        it("withArgs方法可以与onCall结合使用", function () {
+        it("withArgs方法可以指定每次调用的行为", function () {
             var callback = sinon.stub();
             callback.withArgs(3).returns(1);
             callback.withArgs(1, 2).returns(2);
@@ -206,6 +206,21 @@ describe("测试SinonJs", function () {
             t.a.callArg(0);
 
             expect(m).toEqual(100);
+        });
+        it("可以精确到某一次的调用", function () {
+            var m = 0;
+            t.a(function () {
+                m = 100;
+            });
+            t.a(function () {
+                m = 200;
+            });
+
+            expect(m).toEqual(0);
+
+            t.a.getCall(1).callArg(0);
+
+            expect(m).toEqual(200);
         });
         it("callArgOn(index, context)，可传入上下文", function () {
             var obj = {
@@ -249,6 +264,46 @@ describe("测试SinonJs", function () {
             expect(obj.m).toEqual(300);
         });
     });
+
+    describe("onCall与getCall的区别", function () {
+        beforeEach(function () {
+        });
+        afterEach(function () {
+        });
+
+        it("onCall是控制某次调用的行为，在到方法调用前设置", function () {
+            var a = {
+                done: function () {
+                    return 1;
+                }
+            };
+            var t = {
+                done: function () {
+                    return a.done();
+                }
+            };
+            sinon.stub(a, "done");
+            a.done.onCall(0).returns(10);
+            a.done.onCall(1).returns(20);
+            a.done.onThirdCall().returns(30);
+
+            expect(t.done()).toEqual(10);
+            expect(t.done()).toEqual(20);
+            expect(t.done()).toEqual(30);
+        });
+        it("getCall是判断某次调用的行为，在到方法调用后设置", function () {
+            var t = {
+                done: sinon.stub()
+            };
+
+            t.done(1);
+            t.done(2);
+
+            expect(t.done.getCall(0).calledWith(1)).toBeTruthy();
+            expect(t.done.secondCall.calledWith(2)).toBeTruthy();
+        });
+    });
+
 
     describe("断言传入的参数", function () {
         var t = null;

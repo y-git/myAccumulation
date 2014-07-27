@@ -151,7 +151,9 @@ describe("LoaderManager", function () {
             });
 
             it("否则，断言", function () {
-                sandbox.stub(YE.Config, "DEBUG", true);
+                sandbox.stub(YE.main, "getConfig").returns({
+                    debug: true
+                });
 
                 expect(function () {
                     manager.ye_isFinishLoad();

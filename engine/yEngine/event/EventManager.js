@@ -57,13 +57,13 @@
             eventType = this._getEventType(event);
 
             if (handlerContext) {
-                _handler = YE.Tool.event.bindEvent(handlerContext, handler);
+                _handler = YYC.Tool.event.bindEvent(handlerContext, handler);
             }
             else {
                 _handler = handler;
             }
 
-            YE.Tool.event.addEvent(eventContext || window, eventType, _handler);
+            YYC.Tool.event.addEvent(eventContext || window, eventType, _handler);
             this._registerEvent(eventType, _handler, eventContext || window);
         },
         _registerEvent: function (eventType, handler, eventContext) {
@@ -83,7 +83,7 @@
 
             if (_keyListeners[eventType]) {
                 _keyListeners[eventType].forEach(function (e, i) {
-                    YE.Tool.event.removeEvent(e[1], eventType, e[0]);
+                    YYC.Tool.event.removeEvent(e[1], eventType, e[0]);
                 });
                 _keyListeners[eventType] = undefined;
             }
@@ -93,7 +93,7 @@
 
             for (eventType in _keyListeners) {
                 _keyListeners[eventType].forEach(function (e, i) {
-                    YE.Tool.event.removeEvent(e[1], eventType, e[0]);
+                    YYC.Tool.event.removeEvent(e[1], eventType, e[0]);
                 });
             }
             _keyListeners = {};

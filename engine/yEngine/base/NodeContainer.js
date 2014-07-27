@@ -48,7 +48,7 @@ namespace("YE").NodeContainer = YYC.AClass(YE.Node, {
         addChilds: function (childs, zOrder, tag) {
             var self = this;
 
-            YE.error(!YE.Tool.judge.isArray(childs), "第一个参数必须为数组");
+            YE.error(!YYC.Tool.judge.isArray(childs), "第一个参数必须为数组");
 
             if (zOrder) {
                 this.ye__isChangeZOrder = true;
@@ -83,7 +83,7 @@ namespace("YE").NodeContainer = YYC.AClass(YE.Node, {
         getChildsByTag: function (tags) {
             var childTag = null,
                 result = false,
-                tags = YE.Tool.judge.isArray(tags) ? tags : [tags];
+                tags = YYC.Tool.judge.isArray(tags) ? tags : [tags];
 
             return this.ye__childs.filter(function (child) {
                 result = false;
@@ -103,7 +103,7 @@ namespace("YE").NodeContainer = YYC.AClass(YE.Node, {
         getChildsByTagExactly: function (tags) {
             var childTag = null,
                 result = false,
-                tags = YE.Tool.judge.isArray(tags) ? tags : [tags];
+                tags = YYC.Tool.judge.isArray(tags) ? tags : [tags];
 
             return this.ye__childs.filter(function (child) {
                 result = false;

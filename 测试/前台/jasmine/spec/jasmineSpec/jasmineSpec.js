@@ -346,7 +346,7 @@ describe("jasmine", function () {
 
             expect(t).toEqual(100);
 
-            testTool.deleteAttribute(foo, "set");
+            testTool.deleteMember(foo, "set");
         });
     });
 

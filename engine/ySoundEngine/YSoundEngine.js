@@ -10,21 +10,21 @@
         Init: function () {
         },
         Private: {
-            _audio: null,
-            _urlArr: null,
-            _onload: null,
-            _onerror: null,
+            ye_audio: null,
+            ye_urlArr: null,
+            ye_onload: null,
+            ye_onerror: null,
 
-            _load: function () {
+            ye_load: function () {
                 //应该在绑定了事件后再设置src
                 //因为设置src后，即会开始加载声音，所以事件handle越早有效越好。
-                this._audio.src = this._getCanPlayUrl();
+                this.ye_audio.src = this.ye_getCanPlayUrl();
             },
-            _getCanPlayUrl: function () {
+            ye_getCanPlayUrl: function () {
                 var self = this,
                     canPlayUrl = null;
 
-                this._urlArr.forEach(function (url) {
+                this.ye_urlArr.forEach(function (url) {
                     var result = url.match(/\.(\w+)$/);
 
                     if (result === null) {
@@ -32,7 +32,7 @@
                         return $break;
                     }
 
-                    if (self._canplay(result[1])) {
+                    if (self.ye_canplay(result[1])) {
                         canPlayUrl = url;
                         return $break;
                     }
@@ -45,7 +45,7 @@
 
                 return canPlayUrl;
             },
-            _canplay: function (mimeType) {
+            ye_canplay: function (mimeType) {
                 var audio = new Audio(),
                     mimeStr = null;
 
@@ -73,7 +73,7 @@
                         break;
                 }
 
-                if (mimeType == 'mp3' && YE.Tool.judge.browser.isFF()) {
+                if (mimeType == 'mp3' && YYC.Tool.judge.browser.isFF()) {
                     return false;
                 }
 
@@ -84,22 +84,22 @@
             initWhenCreate: function (config) {
                 var self = this;
 
-                this._urlArr = config.url;
-                this._onload = config.onload;
-                this._onerror = config.onerror;
+                this.ye_urlArr = config.url;
+                this.ye_onload = config.onload;
+                this.ye_onerror = config.onerror;
 
                 if (!Audio) {
                     YE.log("浏览器不支持Audio对象");
                     return YE.returnForTest;
                 }
 
-                this._audio = new Audio();
+                this.ye_audio = new Audio();
 //
-                this._audio.addEventListener("canplaythrough", function () {
-                    self._onload.call(self, null);
+                this.ye_audio.addEventListener("canplaythrough", function () {
+                    self.ye_onload.call(self, null);
                 }, false);
-                this._audio.addEventListener("error", function () {
-                    self._onerror.call(self, self._audio.error.code);
+                this.ye_audio.addEventListener("error", function () {
+                    self.ye_onerror.call(self, self.ye_audio.error.code);
                 }, false);
 //
 //                audio.autoplay = false;
@@ -110,11 +110,11 @@
 
                  An element must be reloaded in Chrome or it will only play once
                  An element must not be reloaded in Firefox or there will be a delay*/
-                this._audio.addEventListener("ended", function () {
-                    if (YE.Tool.judge.browser.isChrome()) {
+                this.ye_audio.addEventListener("ended", function () {
+                    if (YYC.Tool.judge.browser.isChrome()) {
                         this.load();
                     }
-                    else if (YE.Tool.judge.browser.isFF()) {
+                    else if (YYC.Tool.judge.browser.isFF()) {
                         this.currentTime = 0;
                     }
                     else {
@@ -122,13 +122,13 @@
                     }
                 }, false);
 
-                this._load();
+                this.ye_load();
 
                 setTimeout(function () {
                 }, 50);
             },
             play: function () {
-                this._audio.play();
+                this.ye_audio.play();
             }
         },
         Static: {

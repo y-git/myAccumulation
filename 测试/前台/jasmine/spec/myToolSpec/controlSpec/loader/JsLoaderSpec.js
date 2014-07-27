@@ -6,6 +6,9 @@
     var src1 = "../../Scripts/jasmine/spec/controlSpec/loader/testJs1.js",
         src2 = "../../Scripts/jasmine/spec/controlSpec/loader/testJs2.js";
 
+    //ToDo 使用YTool->path->getJsDir动态获得src路径
+    //ToDo 测试onload钩子的调用（_loadNext中调用）
+
     function loadSingleJs(func, obj) {
             //jsLoader = new JsLoader();
 
