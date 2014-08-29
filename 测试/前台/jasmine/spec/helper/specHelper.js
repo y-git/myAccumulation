@@ -47,17 +47,17 @@ beforeEach(function () {
         toBeFalsy: function () {
             return this.actual === false;
         },
-        //包含字符串
-        toContain: function (expected) {
-            var reg = new RegExp(expected);
-
-            if (this.actual.match(reg)) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        },
+//        //包含字符串
+//        toContain: function (expected) {
+//            var reg = new RegExp(expected);
+//
+//            if (this.actual.match(reg)) {
+//                return true;
+//            }
+//            else {
+//                return false;
+//            }
+//        },
         /**
          * judge whether both type is equal(recursion)
 

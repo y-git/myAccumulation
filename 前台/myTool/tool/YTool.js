@@ -501,6 +501,53 @@
      * 继承
      */
     Tool.extend = (function () {
+        function _copyDeep(parent, child, func) {
+            var i = null,
+                len = 0,
+                toStr = Object.prototype.toString,
+                sArr = "[object Array]",
+                sOb = "[object Object]",
+                type = "",
+                _child = null;
+
+            //数组的话，不获得Array原型上的成员。
+            if (toStr.call(parent) === sArr) {
+                _child = child || [];
+
+                for (i = 0, len = parent.length; i < len; i++) {
+                    type = toStr.call(parent[i]);
+                    if (type === sArr || type === sOb) {    //如果为数组或object对象
+                        func(_child, i, type === sArr ? [] : {});
+                        arguments.callee(parent[i], _child[i], func);
+                    }
+                    else {
+                        _child[i] = parent[i];
+                    }
+                }
+            }
+            //对象的话，要获得原型链上的成员。因为考虑以下情景：
+            //类A继承于类B，现在想要拷贝类A的实例a的成员（包括从类B继承来的成员），那么就需要获得原型链上的成员。
+            else if (toStr.call(parent) === sOb) {
+                _child = child || {};
+
+                for (i in parent) {
+                    type = toStr.call(parent[i]);
+                    if (type === sArr || type === sOb) {    //如果为数组或object对象
+                        func(_child, i, type === sArr ? [] : {});
+                        arguments.callee(parent[i], _child[i], func);
+                    }
+                    else {
+                        _child[i] = parent[i];
+                    }
+                }
+            }
+            else {
+                _child = parent;
+            }
+
+            return _child;
+        }
+
         return {
             /**
              * 浅拷贝
@@ -581,48 +628,14 @@
              * @returns
              */
             extendDeep: function (parent, child) {
-                var i = null,
-                    len = 0,
-                    toStr = Object.prototype.toString,
-                    sArr = "[object Array]",
-                    sOb = "[object Object]",
-                    type = "",
-                    _child = null;
-
-                //数组的话，不获得Array原型上的成员。
-                if (toStr.call(parent) === sArr) {
-                    _child = child || [];
-
-                    for (i = 0, len = parent.length; i < len; i++) {
-                        type = toStr.call(parent[i]);
-                        if (type === sArr || type === sOb) {    //如果为数组或object对象
-                            _child[i] = type === sArr ? [] : {};
-                            arguments.callee(parent[i], _child[i]);
-                        } else {
-                            _child[i] = parent[i];
-                        }
-                    }
-                }
-                //对象的话，要获得原型链上的成员。因为考虑以下情景：
-                //类A继承于类B，现在想要拷贝类A的实例a的成员（包括从类B继承来的成员），那么就需要获得原型链上的成员。
-                else if (toStr.call(parent) === sOb) {
-                    _child = child || {};
-
-                    for (i in parent) {
-                        type = toStr.call(parent[i]);
-                        if (type === sArr || type === sOb) {    //如果为数组或object对象
-                            _child[i] = type === sArr ? [] : {};
-                            arguments.callee(parent[i], _child[i]);
-                        } else {
-                            _child[i] = parent[i];
-                        }
-                    }
-                }
-                else {
-                    _child = parent;
-                }
-
-                return _child;
+                return _copyDeep(parent, child, function (child, i, emptyStructure) {
+                    child[i] = emptyStructure;
+                });
+            },
+            mix: function (parent, child) {
+                return _copyDeep(parent, child, function (child, i, emptyStructure) {
+                    child[i] = child[i] ? child[i] : emptyStructure;
+                });
             },
             /**
              * 原型继承
@@ -688,7 +701,7 @@
                         $(whole).show();
                     }).ajaxError(function (e, xhr, settings, exception) {
                         _timeCount += 2;    //计数加2，用来判断是否加载失败
-                        $(this).html("加载失败：" + exception).show();
+                        $(this).html("加载失败：" + xhr.responseText).show();
                         $(whole).hide();
                     });
             },
@@ -717,6 +730,7 @@
                     data: setting.data,
                     type: setting.type || "GET",
                     dataType: setting.dataType,
+                    async: setting.async === undefined ? true : setting.async,
 
                     beforeSend: function () {
                         _timeCount = 0;  //归位
@@ -726,7 +740,7 @@
                     },
                     error: function (jqXHR, textStatus, exception) {
                         _timeCount += 2;    //计数加2，用来判断是否加载失败
-                        $(loading).html("加载失败：" + exception).show();
+                        $(loading).html("加载失败：" + jqXHR.responseText).show();
                         $(whole).hide();
                     },
                     success: function (data) {
@@ -1217,7 +1231,7 @@
     Tool.selector = (function () {
         return {
             /*返回当前元素*/
-            current: function (e) {
+            getCurrentDom: function (e) {
                 /*  已修改！这样谷歌浏览器下也可以正常返回！
                  9-28
 

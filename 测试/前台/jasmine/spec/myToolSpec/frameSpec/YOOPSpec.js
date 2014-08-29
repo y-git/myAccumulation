@@ -616,47 +616,30 @@
          */
     });
 
-    describe("根据《YOOP记录》测试“已解决的问题”", function () {
-        it("解决“若父类的属性为引用类型（数组或对象）a，则如果子类的实例s1对a进行修改或者sub调用修改a的方法，则第二次创建实例s2的a为修改过后的a！”", function () {
+    describe("解决发现的问题", function () {
+        it("解决“实例之间不应该共享属性”", function () {
+            var A = YYC.Class({
+                Init: function () {
+                },
+                Public: {
+                    a: []
+                }
+            });
+
+            var t = new A();
+            t.a.push("a");
+            var m = new A();
+
+            expect(t.a).toEqual(["a"]);
+            expect(m.a).toEqual([]);
+        });
+        it("解决“继承于同一父类的子类实例之间不应该共享属性”", function () {
             var Parent = YYC.AClass({
                 Init: function () {
                     console.log("Parent Init!");
                 },
                 Public: {
                     a: []
-                }
-            });
-            var Sub = YYC.Class(Parent, {
-                Init: function () {
-                },
-                Public: {
-                    add: function (obj) {
-                        this.a.push(obj);
-                    }
-                }
-            });
-
-            var t = new Sub();
-            t.a.push("a");
-            var m = new Sub();
-            m.add("b");
-            var k = new Sub();
-            k.add("c");
-
-            expect(k.a).toEqual(["c"]);
-            expect(m.a).toEqual(["b"]);
-            expect(t.a).toEqual(["a"]);
-        });
-        it("解决“若父类Parent的属性为引用类型（数组或对象）a，有两个子类Sub1、Sub2。如果子类Sub1的实例s1对a进行修改或者sub调用修改a的方法，则子类Sub2的实例的a为修改过后的a！”", function () {
-            var Parent = YYC.AClass({
-                Init: function () {
-                    console.log("Parent Init!");
-                },
-                Public: {
-                    a: [],
-                    add: function () {
-                        this.a.push("a");
-                    }
                 }
             });
             var Sub1 = YYC.Class(Parent, {
@@ -674,8 +657,8 @@
             t.a.push("a");
             var k = new Sub2();
 
+            expect(t.a).toEqual(["a"]);
             expect(k.a).toEqual([]);
-
         });
         describe("解决“若A1为抽象类，A2（抽象类）继承于A1，B（类）继承于A2，A1、A2、B都有同名方法a，A2和B在a方法中都通过this.baseClass调用父类同名方法。则如果B的实例b调用a方法，则A2、B的a方法中的this.baseClass均指向A2（照理说A2的this.baseClass应该指向A1）！", function () {
             it("可以使用baseClass属性来访问父类：如baseClass如上一级父类，_baseClass调用上上一级父类，依次类推", function () {
@@ -691,7 +674,7 @@
                     Public: {
                         a: function () {
                             this.arr.push(2);
-                            this.baseClass.a.call(this, null);
+                            this.baseClass.a.call(this, null);  //调用A1.a
                         }
                     }
                 });
@@ -699,8 +682,8 @@
                     Public: {
                         a: function () {
                             this.arr.push(3);
-                            this._baseClass.a.call(this, null);
-                            this.baseClass.a.call(this, null);
+                            this._baseClass.a.call(this, null); //调用A2.a
+                            this.baseClass.a.call(this, null);  //调用A1.a
 
                             return this.arr;
                         }
@@ -773,17 +756,12 @@
     });
 
     describe("isInstanceOf", function () {
-        beforeEach(function () {
-        });
-        afterEach(function () {
-        });
-
         it("直接判断是否为Class的实例", function () {
             var A = YYC.Class({});
 
             expect(new A().isInstanceOf(A)).toBeTruthy();
         });
-        describe("测试继承抽象类时能否正常工作", function () {
+        describe("测试继承抽象类时的情况", function () {
             it("测试1", function () {
                 var A = YYC.AClass({});
                 var B = YYC.Class(A, {});
@@ -804,7 +782,7 @@
             });
         });
 
-        describe("测试继承接口时能否正常工作", function () {
+        describe("测试继承接口时的情况", function () {
             it("测试1", function () {
                 var A = YYC.Interface("a");
                 var B = YYC.Class({Interface: A}, {
@@ -1022,7 +1000,7 @@
             B = YYC.Class(A, {
                 Public: {
                     done: function () {
-                        this.baseClass.done.call(this,null);
+                        this.baseClass.done.call(this, null);
                     }
                 }
             });
@@ -1048,33 +1026,33 @@
         });
 
         it("让父类指定方法不执行，用于Class的测试方法中调用了父类方法的情况", function () {
-            expect(function(){
+            expect(function () {
                 b.done();
             }).toThrow();
-            expect(function(){
+            expect(function () {
                 c.done();
             }).toThrow();
 
             b.stubParentMethod(sandbox, "done");
             c.stubParentMethod(sandbox, "done");
 
-            expect(function(){
+            expect(function () {
                 b.done();
             }).not.toThrow();
-            expect(function(){
+            expect(function () {
                 c.done();
             }).not.toThrow();
         });
-        it("可将父类指定方法替换为假方法",function(){
-            c.stubParentMethod(sandbox, "done", function(){
-                this.val =1;
+        it("可将父类指定方法替换为假方法", function () {
+            c.stubParentMethod(sandbox, "done", function () {
+                this.val = 1;
             });
 
             c.done();
 
             expect(c.val).toEqual(1);
         });
-        it("可测试父类指定方法的调用情况", function () {
+        it("可按照sinon->stub API测试父类指定方法的调用情况", function () {
             c.stubParentMethod(sandbox, "done");
 
             c.done();
@@ -1082,6 +1060,7 @@
             expect(c.lastBaseClassForTest.done.calledOnce).toBeTruthy();
         });
     });
+
     describe("stubParentMethodByAClass", function () {
         var sandbox = null;
         var A = null,
@@ -1089,7 +1068,6 @@
             t = null;
 
         beforeEach(function () {
-            //想要测试B的done方法，必须先建一个空子类继承B，然后测试空子类的done方法
             A = YYC.AClass({
                 Public: {
                     a: 0,
@@ -1106,6 +1084,7 @@
                 }
             });
 
+            //想要测试B的done方法，必须先建一个空子类继承B，然后测试空子类的done方法
             function getInstance() {
                 var T = YYC.Class(B, {
                 });
@@ -1128,16 +1107,16 @@
 
             expect(t.done).not.toThrow();
         });
-        it("可将父类指定方法替换为假方法",function(){
-            t.stubParentMethodByAClass(sandbox, "done", function(){
-                this.val =1;
+        it("可将父类指定方法替换为假方法", function () {
+            t.stubParentMethodByAClass(sandbox, "done", function () {
+                this.val = 1;
             });
 
             t.done();
 
             expect(t.val).toEqual(1);
         });
-        it("可测试父类指定方法的调用情况", function () {
+        it("可按照sinon->stub API测试父类指定方法的调用情况", function () {
             t.stubParentMethodByAClass(sandbox, "done");
 
             t.done();
@@ -1145,4 +1124,82 @@
             expect(t.lastBaseClassForTest.done.calledOnce).toBeTruthy();
         });
     });
+
+    it("获得当前版本号", function () {
+        expect(YYC.YOOP.version).toBeString();
+    });
+
+    describe("测试命名前缀的问题", function () {
+        it("测试私有成员前缀", function () {
+            var A = YYC.Class({
+                Private: {
+                    _val: 100
+                },
+                Public: {
+                    getVal: function () {
+                        return this._val;
+                    }
+                }
+            });
+
+            var B = YYC.Class(A, {
+                Private: {
+                    __val: 200
+                },
+                Public: {
+                    getVal: function () {
+                        return this.base();
+                    }
+                }
+            });
+
+            expect(new B().getVal()).toEqual(100);
+        });
+        it("测试保护成员前缀", function () {
+            var A = YYC.Class({
+                Protected: {
+                    P_val: 100
+                },
+                Public: {
+                    getVal: function () {
+                        return this.P_val;
+                    }
+                }
+            });
+
+            var B = YYC.Class(A, {
+                Protected: {
+                    P__val: 200
+                },
+                Public: {
+                    getVal: function () {
+                        return this.base();
+                    }
+                }
+            });
+
+            expect(new B().getVal()).toEqual(100);
+        });
+    });
+
+
+    /*
+     describe("YOOP使用方式", function () {
+     describe("支持AMD、CMD、CommonJS规范", function () {
+     it("可在seajs、node.js中使用", function () {
+     var yoop = require("./YOOP.js");
+
+     yoop.Class({});
+     ...
+     });
+     });
+
+     it("支持通过script标签直接引用",function(){
+     页面上引用<script src="./YOOP.js"></script>
+     通过YYC命名空间使用
+     YYC.Class({});
+     ...
+     });
+     });
+     */
 });

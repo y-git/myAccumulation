@@ -42,12 +42,12 @@ describe("YTool.js", function () {
                     var t = "a",
                         m = 'b';
 
-                    return 1+2;
+                    return 1 + 2;
                 });
 
                 expect(str).toContain('var t = "a"');
                 expect(str).toContain("m = 'b';");
-                expect(str).toContain("return 1\\+2");
+                expect(str).toContain("return 1 + 2");
             });
             it("其余类型的参数转换为字符串", function () {
                 //expect(convert.toNumber("")).toEqual(0);
@@ -501,6 +501,87 @@ describe("YTool.js", function () {
                     pixelOffsetX: 0,
                     pixelOffsetY: 0
                 });
+            });
+        });
+
+        describe("extendDeep", function () {
+            it("如果拷贝对象为数组，能够成功拷贝（不拷贝Array原型链上的成员）", function () {
+                var parent = [1, { x: 1, y: 1 }, "a", { x: 2 }, [2]];
+
+                var result = extend.extendDeep(parent);
+
+                expect(result.length).toEqual(5);
+                expect(result).toEqual(parent);
+                expect(result).not.toBeSame(parent);
+            });
+
+            it("如果拷贝对象为对象，能够成功拷贝（能拷贝原型链上的成员）", function () {
+                function A() {
+                }
+                A.prototype.a = 1;
+                function B() {
+                }
+                B.prototype = A.prototype;
+                B.prototype.b = { x: 1, y: 1 };
+                B.prototype.c = [
+                    { x: 1 },
+                    [2]
+                ];
+                var t = new B();
+
+                var result = extend.extendDeep(t);
+
+                expect(result).toEqual(
+                    {
+                        a: 1,
+                        b: { x: 1, y: 1 },
+                        c: [
+                            { x: 1 },
+                            [2]
+                        ]
+                    });
+                expect(result).not.toBeSame(t);
+            });
+            it("parent覆盖性拷贝到child中", function () {
+                var parent = {c: {
+                        ttt: 1
+                    }},
+                    child = {
+                        b: 1,
+                        c: {
+                            show: [],
+                            a: 100
+                        }
+                    };
+
+                extend.extendDeep(parent, child);
+
+                expect(child).toEqual({b: 1, c: {
+                    ttt: 1
+                }});
+            });
+        });
+
+        describe("mix", function () {
+            it("将一个对象的成员非覆盖性地拷贝到另外一个对象中", function () {
+                var result = extend.mix({a: {
+                    b: 1,
+                    c: {
+                        show: [],
+                        a: 100
+                    }
+                }}, {a: {
+                    d: 100
+                }});
+
+                expect(result).toEqual({a: {
+                    b: 1,
+                    c: {
+                        show: [],
+                        a: 100
+                    },
+                    d: 100
+                }});
             });
         });
     });

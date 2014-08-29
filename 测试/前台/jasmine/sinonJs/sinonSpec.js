@@ -271,7 +271,7 @@ describe("测试SinonJs", function () {
         afterEach(function () {
         });
 
-        it("onCall是控制某次调用的行为，在到方法调用前设置", function () {
+        it("onCall控制某次调用的行为，在方法调用前设置", function () {
             var a = {
                 done: function () {
                     return 1;
@@ -291,7 +291,7 @@ describe("测试SinonJs", function () {
             expect(t.done()).toEqual(20);
             expect(t.done()).toEqual(30);
         });
-        it("getCall是判断某次调用的行为，在到方法调用后设置", function () {
+        it("getCall判断某次调用的行为，在方法调用后设置", function () {
             var t = {
                 done: sinon.stub()
             };

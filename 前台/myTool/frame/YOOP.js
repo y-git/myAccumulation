@@ -1,11 +1,11 @@
 ﻿/***********************************************
- OOP框架YOOP    v1.0
+ Javascript OOP框架YOOP    v1.1
 
- 作者：YOOP
- 日期：2013-06-09
- 电子邮箱：395976266@qq.com
- QQ: 395976266
- 博客：http://www.cnblogs.com/chaogex/
+ author：YYC
+ date：2013-06-09
+ email：395976266@qq.com
+ qq: 395976266
+ blog：http://www.cnblogs.com/chaogex/
 
 
  修改记录：
@@ -167,11 +167,11 @@
 
  2013.06.07
 
- YOOP.AClass、YOOP.Class增加“可以将虚方法定义在外面，表示公有虚方法”
+ YYC.AClass、YYC.Class增加“可以将虚方法定义在外面，表示公有虚方法”
 
- YOOP.AClass不验证是否实现了接口，但是可以继承接口成员（可以交给子类Class来验证）。
+ YYC.AClass不验证是否实现了接口，但是可以继承接口成员（可以交给子类Class来验证）。
 
- YOOP.Interface、YOOP.AClass、YOOP.Class可以继承多个接口。
+ YYC.Interface、YYC.AClass、YYC.Class可以继承多个接口。
 
  修改了buildClass、buildAClass、__getByParent传入的参数。
 
@@ -238,12 +238,19 @@
  支持AMD、CMD、CommonJS规范，支持通过script标签直接引用（引入命名空间YYC）
  在seajs、nodejs和直接引用script中运行测试通过
 
+ 2014.08.26
+ 增加YOOP.version属性（YYC.YOOP.version），获得当前版本号。
+ F中只拷贝原型的属性到实例中，所有实例共享原型的方法。（_copyPrototypeToInstance改为_copyProtoAttrToInstance）
+
+ 版本升级为v1.1，更新博文，上传到GitHub中
+
  ************************************************/
 (function () {
-    var global = this;
-    var YOOP = {};
+    var version = "1.1";
+    var global = this,
+        YOOP = {};
 
-    /************************************************** js对象扩展 ************************************************************/
+    //js对象扩展
     (function () {
         String.prototype.contain = function (str) {
             var reg = new RegExp(str);  //str需要转义
@@ -255,10 +262,9 @@
             }
         }
     }());
-    /*****************************************************************************************************************************/
 
-        //获得在原型prototype中不存在同名的str。
-        //如果有同名，则加上前缀"_"
+    //获得在原型prototype中不存在同名的str。
+    //如果有同名，则加上前缀"_"
     function _getNoRepeatStrInPrototype(prototype, str) {
         var new_str = "";
 
@@ -288,7 +294,8 @@
                 if (type === sArr || type === sOb) {    //如果为数组或object对象
                     _child[i] = type === sArr ? [] : {};
                     arguments.callee(parent[i], _child[i]);
-                } else {
+                }
+                else {
                     _child[i] = parent[i];
                 }
             }
@@ -299,9 +306,6 @@
             _child = child || {};
 
             for (i in parent) {
-                //保证baseClass类型为function（A或者F），而不是object
-                //从而baseClass.constructor.prototype为父类的原型，而不是Object的原型
-                //用于解决stubParentMethodByAClass的问题
                 if (i.contain("baseClass")) {
                     _child[i] = parent[i];
                     continue;
@@ -311,7 +315,8 @@
                 if (type === sArr || type === sOb) {
                     _child[i] = type === sArr ? [] : {};
                     arguments.callee(parent[i], _child[i]);
-                } else {
+                }
+                else {
                     _child[i] = parent[i];
                 }
             }
@@ -378,8 +383,6 @@
      ）
      因为如果写成原型形式，则Interface/AClass/Class的实例就共享同一个I/A/F类！这样会造成不同的类之间互相干扰！
      */
-
-
     (function () {
         function Interface() {
             var that = this;
@@ -569,7 +572,6 @@
 
                     if (this.parentClass) {
                         for (name in parentClass.prototype) {
-//                            if (parentClass.prototype.hasOwnProperty(name)) {
                             if (name === "constructor") {
                                 continue;
                             }
@@ -581,7 +583,6 @@
                                     this._checkAbstractAttribute(name);
                                 }
                             }
-//                            }
                         }
                     }
                 },
@@ -688,44 +689,12 @@
                         parentClass = this.parentClass;
 
                     if (parentClass) {
-                        /**
-                         *  不使用“_class.prototype = new parentClass()”来继承，
-                         *  因为这样会在创建类时（调用YYC.Class）调用父类的构造函数！
-                         *  而用户期望的是在创建实例时
-                         *  （var B = YOOP.Class(A, {});  实际上会在此处就调用A的构造函数！
-                         *  var b = new B();    期望此处调用A的构造函数
-                         *  ）
-                         *  才调用父类的构造函数！
-                         */
                         _class.prototype = _extendDeep(parentClass.prototype);
-//                    _class.prototype = new parentClass();
-//                    _class.prototype = parentClass.prototype;
-//                    _extendDeep(parentClass.prototype, _class.prototype);
-
-//                    var F = function(){};
-//                    F.prototype = parentClass.prototype;
-//                    _class.prototype = new F();
-
                         _class.prototype.constructor = _class;
-
-//                    function addBaseClass(_class, name, val) {
-//                        var backup = null;
-//
-//                        backup = _class.prototype[name];
-//                        _class.prototype[name] = val;
-//
-//                        if (!backup) {
-//                            return;
-//                        }
-//
-//                        addBaseClass(_class, "_" + name, backup);
-//                    }
-
                         // 如果父类存在，则实例对象的baseClass指向父类的原型。
                         // 这就提供了在实例对象中调用父类方法的途径。
-                        //baseClass的方法是指向this.parentClass.prototype的，不是指向（子类）的！
+                        // 注意：baseClass的方法是指向this.parentClass.prototype的，不是指向（子类）的！
                         _class.prototype[_getNoRepeatStrInPrototype(parentClass.prototype, "baseClass")] = parentClass.prototype;
-//addBaseClass(_class, "baseClass", parentClass.prototype);
                     }
                 },
                 P_addInit: function () {
@@ -805,9 +774,6 @@
         }());
 
         //创建抽象类
-        //抽象类能够继承接口、抽象类以及实体类，但此处约定抽象类只能继承接口和抽象类，不能继承实体类！
-        //（这样方便判断抽象类是否包含全部的父类（接口/抽象类）成员）
-
         function AClass() {
             var that = this;
 
@@ -819,7 +785,7 @@
 
             _initParentContainer(A);
 
-            // 创建的类（构造函数）
+            //构造函数
             function A() {
             };
 
@@ -904,7 +870,7 @@
 
                 this.P_inherit();
                 this.P_inheritInterface();
-                //抽象类本身因为不能实例化，所以不在A中调用构造函数Init。
+                //抽象类本身不能实例化，所以不在A中调用构造函数Init。
                 //抽象类中的构造函数供子类构造函数中调用。
                 this.P_addInit();
                 this.P_addPrivateMember();
@@ -935,7 +901,6 @@
         AClass.prototype = new Structure();
 
         //创建普通类
-        //父类_parent可以为{Class: xx, Interface: xx}，或者直接为xx类
         function Class() {
             var that = this;
 
@@ -950,45 +915,41 @@
 
             _initParentContainer(F);
 
-            // 创建的类（构造函数）
+            //构造函数
             function F() {
                 var self = this,
                     args = arguments;
 
-                function _copyPrototypeToInstance() {
-                    _extendDeep(F.prototype, self);
-                    //F.prototype.baseClass的constructor为自带的属性，因此extendDeep中的for不会遍历到F.prototype.baseClass.constructor
+                function _copyProtoAttrToInstance() {
+                    var i = null,
+                        member = null,
+                        toStr = Object.prototype.toString;
+
+                    for (i in F.prototype) {
+                        if (F.prototype.hasOwnProperty(i)) {
+                            member = F.prototype[i];
+                            if (toStr.call(member) === "[object Function]") {
+                                continue;
+                            }
+
+                            self[i] = _extendDeep(member);
+                        }
+                    }
+
+                    //F.prototype.baseClass的constructor为自带的属性，因此_extendDeep中的for不会遍历到F.prototype.baseClass.constructor
                     //因此该属性不会复制到self中，需要进行手动复制
                     if (self.baseClass) {
                         self.baseClass.constructor = F.prototype.baseClass.constructor;
                     }
+                }
 
-                };
                 function _init() {
-                    // 如果当前处于实例化类的阶段，则调用构造函数Init
                     if (!that.initializing) {
                         self.Init && self.Init.apply(self, args);
                     }
-                };
+                }
 
-                _copyPrototypeToInstance();
-                _init();
-
-                this.isInstanceOf = function (_class) {
-//                    self._inheritedInterfaces = self._inheritedInterfaces || [];
-                    var i = 0,
-                        len = F.yoop_parents.length;
-
-                    for (i = 0; i < len; i++) {
-                        if (F.yoop_parents[i] === _class) {
-                            return true;
-                        }
-                    }
-
-                    return this instanceof  _class;
-                };
-
-                function getInheritLayerCount(classInstance) {
+                function _getInheritLayerCount(classInstance) {
                     var count = 0,
                         name = "baseClass";
 
@@ -1000,8 +961,8 @@
                     return count + 1;
                 }
 
-                function getBaseClass(index) {
-                    var count = getInheritLayerCount(self),
+                function _getBaseClass(index) {
+                    var count = _getInheritLayerCount(self),
                         index = index || 0,
                         i = 0,
                         len = count - 1 - index,
@@ -1018,42 +979,42 @@
                     return  self[baseClass];
                 }
 
-                this.stubParentMethod = function (sandbox, method, func) {
-                    if (arguments.length === 2) {
-                        sandbox.stub(getBaseClass(0).constructor.prototype, method);
-                    }
-                    else if (arguments.length === 3) {
-                        sandbox.stub(getBaseClass(0).constructor.prototype, method, func);
+                _copyProtoAttrToInstance();
+                _init();
+
+                this.isInstanceOf = function (_class) {
+                    var i = 0,
+                        len = F.yoop_parents.length;
+
+                    for (i = 0; i < len; i++) {
+                        if (F.yoop_parents[i] === _class) {
+                            return true;
+                        }
                     }
 
-                    this.lastBaseClassForTest = getBaseClass(0).constructor.prototype;
+                    return this instanceof  _class;
+                };
+
+                this.stubParentMethod = function (sandbox, method, func) {
+                    if (arguments.length === 2) {
+                        sandbox.stub(_getBaseClass(0).constructor.prototype, method);
+                    }
+                    else if (arguments.length === 3) {
+                        sandbox.stub(_getBaseClass(0).constructor.prototype, method, func);
+                    }
+
+                    this.lastBaseClassForTest = _getBaseClass(0).constructor.prototype;
                 };
                 this.stubParentMethodByAClass = function (sandbox, method, func) {
                     if (arguments.length === 2) {
-                        sandbox.stub(getBaseClass(1).constructor.prototype, method);
+                        sandbox.stub(_getBaseClass(1).constructor.prototype, method);
                     }
                     else if (arguments.length === 3) {
-                        sandbox.stub(getBaseClass(1).constructor.prototype, method, func);
+                        sandbox.stub(_getBaseClass(1).constructor.prototype, method, func);
                     }
 
-                    this.lastBaseClassForTest = getBaseClass(1).constructor.prototype;
+                    this.lastBaseClassForTest = _getBaseClass(1).constructor.prototype;
                 };
-
-                /*不能删除私有成员和保护成员！否则类的成员就不能调用到私有和保护的成员了（因为已经删除了）！
-                 对象的创建算法参考http://www.cnblogs.com/TomXu/archive/2012/02/06/2330609.html
-
-
-
-
-                 //删除私有成员和保护成员，这样外界就不能访问私有和保护成员了！
-                 for (name in this) {
-                 if (name.search(/(^_)|(^P_)/) !== -1) {
-                 delete F.prototype[name];
-                 //                                                    this[name] = null;
-                 }
-
-                 }
-                 */
             }
 
             function _getByParent(args) {
@@ -1165,11 +1126,9 @@
                 var name = "";
 
                 for (name in F.prototype) {
-//                    if (F.prototype.hasOwnProperty(name)) {
                     if (name.contain("Interface_")) {
                         return true;
                     }
-//                    }
                 }
 
                 return false;
@@ -1188,20 +1147,14 @@
 
         Class.prototype = new Structure();
 
-        /*
-         下面的写法有问题！因为只有载入YOOP.js时，创建了AClass的实例。
-         调用YYC.AClass时，只是引用该实例的buildAClass，而不会再创建AClass实例。
-         也就是说，所有YYC.AClass都共用一个AClass的实例！共用AClass实例的属性（如parent等）！
-
-         YOOP.AClass = new AClass().buildAClass;
-         */
-
-
         YOOP.AClass = function () {
             return new AClass().buildAClass(arguments);
         };
         YOOP.Class = function () {
             return new Class().buildClass(arguments);
+        };
+        YOOP.YOOP = {
+            version: version
         };
     }());
 
