@@ -208,20 +208,6 @@ describe("Director", function () {
         });
     });
 
-    describe("ye_endLoop", function () {
-        it("结束主循环", function () {
-            sandbox.stub(window, "clearInterval");
-            sandbox.stub(window, "cancelNextRequestAnimationFrame");
-            director.ye_loopId = 1;
-
-            director.ye_endLoop();
-
-            expect(window.clearInterval.calledWith(director.ye_loopId)).toBeTruthy();
-            expect(window.cancelNextRequestAnimationFrame.calledWith(director.ye_loopId)).toBeTruthy();
-        });
-    });
-
-
     describe("测试循环内容ye_loopBody", function () {
         var fakeScene = null;
 
@@ -272,7 +258,7 @@ describe("Director", function () {
             var fps = 60;
             var sandbox = sinon.sandbox.create();
             sandbox.stub(YE.main, "getConfig").returns({
-                debug:true
+                isDebug: true
             });
             director.ye_STARTING_FPS = fps;
 
@@ -283,7 +269,7 @@ describe("Director", function () {
         it("否则，计算精灵每帧移动的距离（单位为像素pix）。距离=精灵每秒移动像素值（即速度）*每一帧持续的秒数（即1/fps）", function () {
             var sandbox = sinon.sandbox.create();
             sandbox.stub(YE.main, "getConfig").returns({
-                debug:false
+                isDebug: false
             });
             director.ye_fps = 10;
 
@@ -295,15 +281,13 @@ describe("Director", function () {
 
     describe("end", function () {
         it("停止主循环", function () {
-            sandbox.stub(director, "ye_endLoop");
+            sandbox.stub(window, "clearInterval");
+            sandbox.stub(director, "ye_gameStatus", director.forTest_getGameStatus().NORMAL);
+            sandbox.stub(director, "ye_loopId", 1);
 
             director.end();
 
-            expect(director.ye_endLoop.calledOnce).toBeTruthy();
-        });
-        it("设置游戏状态为STOP", function () {
-            director.end();
-
+            expect(window.clearInterval.calledWith(director.ye_loopId)).toBeTruthy();
             expect(director.ye_gameStatus).toEqual(director.forTest_getGameStatus().END);
         });
         it("停止所有计时器", function () {
@@ -333,6 +317,13 @@ describe("Director", function () {
             afterEach(function () {
             });
 
+            it("停止主循环", function () {
+                sandbox.stub(director, "ye_endLoop");
+
+                director.pause();
+
+                expect(director.ye_endLoop.calledOnce).toBeTruthy();
+            });
             it("设置游戏状态为PAUSE", function () {
                 director.pause();
 
@@ -344,13 +335,6 @@ describe("Director", function () {
                 director.pause();
 
                 expect(director.ye_lastLoopInterval).toEqual(director.ye_loopInterval);
-            });
-            it("停止主循环", function () {
-                sandbox.stub(director, "ye_endLoop");
-
-                director.pause();
-
-                expect(director.ye_endLoop.calledOnce).toBeTruthy();
             });
         });
     });

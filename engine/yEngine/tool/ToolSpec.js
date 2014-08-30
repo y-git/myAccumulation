@@ -40,7 +40,7 @@ describe("Tool.js", function () {
             describe("如果配置为调试状态", function () {
                 beforeEach(function () {
                     sandbox.stub(YE.main, "getConfig").returns({
-                        debug: true
+                        isDebug: true
                     });
                 });
 

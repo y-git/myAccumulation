@@ -8,10 +8,8 @@
 //单例
 //setConfig
 ////loadEngine
-//loadWhenDomReady:true
+//isLoadWhenDomReady:true
 (function () {
-    var jsLoader = null;
-
     function _extend(destination, source) {
         var property = "";
 
@@ -21,9 +19,11 @@
         return destination;
     }
 
-    jsLoader = {
-        ye_container: [],
+    function JsLoader() {
+        this.ye_container = [];
+    }
 
+    JsLoader.prototype = {
         ye_loadJsSync: function (js, func) {
             var script = null;
 
@@ -93,6 +93,82 @@
         }
     };
 
+    JsLoader.create = function () {
+        return new this();
+    };
+
+//    jsLoader = {
+//        ye_container: [],
+//
+//        ye_loadJsSync: function (js, func) {
+//            var script = null;
+//
+//            script = this.ye_createScript(js);
+//            this.ye_appendScript(script);
+//
+//            this.ye_onloadSync(js, script, func);
+//        },
+//        ye_appendScript: function (script) {
+//            var head = document.getElementsByTagName("head")[0];
+//
+//            head.appendChild(script);
+//        },
+//        ye_createScript: function (js) {
+//            var script = document.createElement("script");
+//            script.type = "text/javascript";
+//            script.src = js.src;
+//
+//            return script;
+//        },
+//        ye_onloadSync: function (js, script, func) {
+//            var self = this;
+//
+//            if (script.readyState) { //IE
+//                script.onreadystatechange = function () {
+//                    if (script.readyState == "loaded" || script.readyState == "complete") {
+//                        script.onreadystatechange = null;
+//                        js.callback && js.callback.apply(js.obj, js.args);
+//
+//                        self.ye_loadNext(func);
+//                    }
+//                };
+//            }
+//            else { //Others
+//                script.onload = function () {
+//                    js.callback && js.callback.apply(js.obj, js.args);
+//
+//                    self.ye_loadNext(func);
+//                };
+//            }
+//        },
+//        ye_loadNext: function (func) {
+//            if (this.ye_container.length == 0) {
+//                this.onload();
+//                return;
+//            }
+//            else {
+//                func.call(this, null);
+//            }
+//        },
+//
+//        onload: function () {
+//        },
+//
+//        add: function (src, callback, args, obj) {
+//            this.ye_container.push({ src: src, callback: callback, args: args || [], obj: obj ? obj : window });
+//
+//            return this;
+//        },
+//        loadSync: function () {
+//            if (this.ye_container.length == 0) {
+//                throw new Error("请先加入js");
+//            }
+//            var js = this.ye_container.shift();
+//
+//            this.ye_loadJsSync(js, this.loadSync);
+//        }
+//    };
+
     //*全局方法
     (function () {
         /**
@@ -132,9 +208,9 @@
 
             //是否处于调试状态
             //如果是，则会开启assert、log方法，Director->getPixPerFrame返回的速度不会受到fps的影响
-            debug: false,
-            showDebugOnPage: false, //是否在页面上显示调试信息
-            loadWhenDomReady: true, //是否在DOM加载完成后自动加载
+            isDebug: true,
+            isShowDebugOnPage: false, //是否在页面上显示调试信息
+            isLoadWhenDomReady: true, //是否在DOM加载完成后自动加载
 //                    showFPS:true,
 //                    frameRate:60,
 //                    tag:'gameCanvas', //the dom element to run cocos2d on
@@ -145,9 +221,9 @@
             }
         },
         ye_engineFilePaths: [
-            "jquery-1.7.js",
-            "YOOP.js",
-            "jsExtend.js"  ,
+            "import/jquery-1.7.js",
+            "import/YOOP.js",
+            "import/jsExtend.js"  ,
 
             "tool/Tool.js" ,
 
@@ -208,7 +284,7 @@
 
             "ui/Graphics.js" ,
 
-            "../ySoundEngine/YSoundEngine.js"
+            "ySoundEngine/YSoundEngine.js"
         ],
         ye_isLoaded: false,
 
@@ -216,7 +292,8 @@
             var engineFilePaths = this.ye_engineFilePaths,
                 engineDir = this.ye_config.engineDir,
                 userFilePaths = this.ye_config.userFilePaths,
-                onload = this.ye_config.onload;
+                onload = this.ye_config.onload,
+                jsLoader = JsLoader.create();
 
             this.ye_isLoaded = true;
             jsLoader.onload = onload;
@@ -236,7 +313,7 @@
         setConfig: function (config) {
             _extend(this.ye_config, config);
 
-            if (this.ye_config.loadWhenDomReady) {
+            if (this.ye_config.isLoadWhenDomReady) {
                 this.ye_loadJsLoader();
             }
         },
@@ -244,7 +321,7 @@
             return this.ye_config;
         },
         load: function () {
-            if (this.ye_config.loadWhenDomReady) {
+            if (this.ye_config.isLoadWhenDomReady) {
                 console.log("已配置为DOM加载完成后自动加载文件，此处不再进行加载");
                 return false;
             }
@@ -257,7 +334,7 @@
         },
 
         forTest_getJsLoader: function () {
-            return jsLoader;
+            return JsLoader;
         }
     };
 

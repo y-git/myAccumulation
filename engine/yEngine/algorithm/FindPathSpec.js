@@ -90,4 +90,24 @@ describe("AStar", function () {
             [2, 1]
         ]);
     });
+
+    it("地图边缘寻路测试", function () {
+        var fakeTerrainData = [
+                [0, 0, 0, 0],
+                [0, 1, 0, 0],
+                [0, 1, 1, 0],
+                [0, 0, 0, 0]
+            ],
+            start = [1, 3],
+            end = [3, 3],
+            result = null;
+
+        result = AStar(fakeTerrainData, start, end, "Euclidean");
+
+        expect(result).toEqual([
+            [ 1, 3 ],
+            [ 2, 3 ],
+            [ 3, 3 ]
+        ]);
+    });
 });

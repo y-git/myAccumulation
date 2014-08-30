@@ -8,8 +8,8 @@
             this.height = this.img.height;
         },
         Private: {
-            ye_flipX: false,
-            ye_flipY: false
+            ye_isFlipX: false,
+            ye_isFlipY: false
         },
         Public: {
             img: null,
@@ -19,20 +19,20 @@
             pixelOffsetY: 0,
 
             setFlipX: function () {
-                this.ye_flipX = true;
+                this.ye_isFlipX = true;
 
                 return this;
             },
             setFlipY: function () {
-                this.ye_flipY = true;
+                this.ye_isFlipY = true;
 
                 return this;
             },
             isFlipX: function () {
-                return this.ye_flipX;
+                return this.ye_isFlipX;
             },
             isFlipY: function () {
-                return this.ye_flipY;
+                return this.ye_isFlipY;
             },
             setAnchor: function (pixelOffsetX, pixelOffsetY) {
                 this.pixelOffsetX = pixelOffsetX;

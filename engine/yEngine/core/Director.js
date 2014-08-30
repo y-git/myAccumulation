@@ -1,4 +1,4 @@
-/**YEngine2D 导演类
+﻿/**YEngine2D 导演类
  * 作者：YYC
  * 日期：2013-12-20
  * 电子邮箱：395976266@qq.com
@@ -84,6 +84,11 @@
                 else {
                     mainLoop = function (time) {
                         self.ye_loopBody(time);
+
+                        if (self.ye_gameStatus === GameStatus.END) {
+                            return;
+                        }
+
                         self.ye_loopId = window.requestNextAnimationFrame(mainLoop);
                     };
                     this.ye_loopId = window.requestNextAnimationFrame(mainLoop);
@@ -92,7 +97,8 @@
             },
             ye_endLoop: function () {
                 window.clearInterval(this.ye_loopId);
-                window.cancelNextRequestAnimationFrame(this.ye_loopId);
+//                window.cancelNextRequestAnimationFrame(this.ye_loopId);
+                this.ye_gameStatus = GameStatus.END;
             }
         },
         Public: {
@@ -126,7 +132,7 @@
                 return this.ye_fps;
             },
             getPixPerFrame: function (speed) {
-                if (YE.main.getConfig().debug) {
+                if (YE.main.getConfig().isDebug) {
                     return speed / this.ye_STARTING_FPS;
                 }
 
@@ -134,7 +140,7 @@
             },
             end: function () {
                 this.ye_endLoop();
-                this.ye_gameStatus = GameStatus.END;
+//                this.ye_gameStatus = GameStatus.END;
                 YYC.Tool.asyn.clearAllTimer(this.ye_timerIndex);
             },
             pause: function () {
@@ -142,13 +148,13 @@
                     return YE.returnForTest;
                 }
 
-                this.ye_gameStatus = GameStatus.PAUSE;
-                this.ye_lastLoopInterval = this.ye_loopInterval;
-
-////                降低cpu消耗
+                ////                降低cpu消耗
 //                this.setLoopIntervalAndRestart(1);
 
                 this.ye_endLoop();
+
+                this.ye_gameStatus = GameStatus.PAUSE;
+                this.ye_lastLoopInterval = this.ye_loopInterval;
             },
             resume: function () {
                 if (this.ye_gameStatus !== GameStatus.PAUSE) {

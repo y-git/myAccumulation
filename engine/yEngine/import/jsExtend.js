@@ -2,6 +2,8 @@
  *  扩展js的对象
  */
 (function () {
+    var global = this;
+    
     function _isArray(val) {
         return Object.prototype.toString.call(val) === "[object Array]";
     }
@@ -82,7 +84,7 @@
 
      */
 
-    window.$break = {};
+    global.$break = {};
 
 
     /*仿prototype.js库 扩展Array类
@@ -279,7 +281,7 @@
 
     //可抛出$break退出循环
     Array.prototype.forEach = function (fn, context) {
-        var scope = context || window;
+        var scope = context || global;
 //        try {
         for (var i = 0, j = this.length; i < j; ++i) {
             if (fn.call(scope, this[i], i, this) === $break) {
@@ -293,7 +295,7 @@
     };
 
     Array.prototype.filter = function (fn, context) {
-        var scope = context || window;
+        var scope = context || global;
         var a = [];
         for (var i = 0, j = this.length; i < j; ++i) {
             if (!fn.call(scope, this[i], i, this)) {
@@ -306,7 +308,7 @@
 
     //筛选出的元素包括序号
     Array.prototype.filterWithIndex = function (fn, context) {
-        var scope = context || window;
+        var scope = context || global;
         var a = [];
         for (var i = 0, j = this.length; i < j; ++i) {
             if (!fn.call(scope, this[i], i, this)) {

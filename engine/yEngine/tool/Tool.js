@@ -441,7 +441,7 @@
         namespace("YE").Tool = Tool;
     }());
 
-    //* debug
+    //* isDebug
     (function () {
         function _logToWebPage(message) {
             $("body").prepend($("<div style='color:red;font-size: 20;'>引擎调试信息：" + message + "</div>"));
@@ -456,8 +456,8 @@
          * @param {String} message
          */
         YE.log = function (message) {
-            if (YE.main.getConfig().debug) {
-                if (!YE.main.getConfig().showDebugOnPage) {
+            if (YE.main.getConfig().isDebug) {
+                if (!YE.main.getConfig().isShowDebugOnPage) {
                     console.log && console.log(message);
                 } else {
                     _logToWebPage(message);
@@ -491,7 +491,7 @@
          * @param message
          */
         YE.assert = function (cond, message) {
-            if (YE.main.getConfig().debug) {
+            if (YE.main.getConfig().isDebug) {
                 if (console.assert) {
                     console.assert(cond, message);
                 }

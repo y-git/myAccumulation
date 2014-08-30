@@ -174,7 +174,7 @@ describe("Spawn", function () {
         it("如果参数小于2，则断言", function () {
             var sandbox = sinon.sandbox.create();
             sandbox.stub(YE.main, "getConfig").returns({
-                debug: true
+                isDebug: true
             });
 
             expect(function () {

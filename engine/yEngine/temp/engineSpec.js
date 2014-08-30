@@ -8,7 +8,7 @@
 //单例
 //setConfig
 ////loadEngine
-//loadWhenDomReady:true
+//isLoadWhenDomReady:true
 (function () {
 
     var _instance = null,
@@ -302,9 +302,9 @@
 
                     //是否处于调试状态
                     //如果是，则会开启assert、log方法，Director->getPixPerFrame返回的速度不会受到fps的影响
-                    debug: false,
-                    showDebugOnPage: false, //是否在页面上显示调试信息
-                    loadWhenDomReady: true, //是否在DOM加载完成后自动加载
+                    isDebug: false,
+                    isShowDebugOnPage: false, //是否在页面上显示调试信息
+                    isLoadWhenDomReady: true, //是否在DOM加载完成后自动加载
 //                    showFPS:true,
 //                    frameRate:60,
 //                    tag:'gameCanvas', //the dom element to run cocos2d on
@@ -313,7 +313,7 @@
                     userFilePaths: []               //add your own files in order here
                 }, config);
 
-                if (this.ye_config.loadWhenDomReady) {
+                if (this.ye_config.isLoadWhenDomReady) {
                     this.ye_loadJsLoader();
                 }
             },
@@ -321,7 +321,7 @@
                 return this.ye_config;
             },
             load: function () {
-                if (this.ye_config.loadWhenDomReady) {
+                if (this.ye_config.isLoadWhenDomReady) {
                     YE.log("已配置为DOM加载完成后自动加载文件，此处不再进行加载");
                     return false;
                 }

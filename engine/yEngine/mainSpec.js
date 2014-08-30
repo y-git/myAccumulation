@@ -5,7 +5,7 @@
  * QQ: 395976266
  * 博客：http://www.cnblogs.com/chaogex/
  */
-describe("Main", function () {
+describe("main", function () {
     var main = null;
     var sandbox = null;
 
@@ -17,18 +17,121 @@ describe("Main", function () {
         sandbox.restore();
     });
 
-    describe("jsLoader", function () {
-        var sandbox = null;
+    describe("JsLoader", function () {
+        var jsLoader = null,
+            src1 = null,
+            src2 = null;
+
+//        function loadSingleJs(func, obj) {
+//            //jsLoader = new JsLoader();
+//
+//            var foo = {
+//                a: 1
+//            };
+//
+//
+//            jsLoader.add(src1, function (value) {
+//                this.a = value;
+//            }, [2], foo);
+//            func.call(obj, null);
+//
+//            testTool.asynRun(function () {
+//                expect(foo.a).toEqual(2);
+//            }, 300);
+//        }
 
         beforeEach(function () {
-            sandbox = sinon.sandbox.create();
+            jsLoader = main.forTest_getJsLoader().create();
+            src1 = YYC.Tool.path.getJsDir("main.js") + "testJs1.js";
+            src2 = YYC.Tool.path.getJsDir("main.js") + "testJs2.js";
         });
         afterEach(function () {
-            sandbox.restore();
+            $("head script[src*=testJs1\\.js]").remove();
+            $("head script[src*=testJs2\\.js]").remove();
         });
 
-        it("", function () {
+//        it("JsLoader存在", function () {
+//            expect(JsLoader).toBeDefined();
+//        });
 
+        describe("add", function () {
+            it("参数为：js文件src1、回调函数、回调函数的参数、回调函数的this指向", function () {
+                var func = {
+                    a: 1
+                };
+
+                jsLoader.add(src1, function () {
+                }, ["a"], func);
+
+                expect(jsLoader.ye_container[0].src).toEqual(src1);
+                expect(jsLoader.ye_container[0].callback).toBeFunction();
+                expect(jsLoader.ye_container[0].args).toEqual(["a"]);
+                expect(jsLoader.ye_container[0].obj.a).toEqual(1);
+            });
+            it("参数中如果没有传递“回调函数的this指向”，则指向默认为window", function () {
+                jsLoader.add(src1, function () {
+                    this.jsLoader_forTest = 2;
+                }, ["a"]);
+                jsLoader.loadSync();
+
+                testTool.asynRun(function () {
+                    expect(window.jsLoader_forTest).toEqual(2);
+
+                    testTool.deleteMember(window, "jsLoader_forTest");
+                }, 300);
+            });
+            it("可以链式加入多个js文件", function () {
+                jsLoader.add(src1,function () {
+                }, []).add(src2, function () {
+                    }, []);
+
+                expect(jsLoader.ye_container[0].src).toEqual(src1);
+                expect(jsLoader.ye_container[1].src).toEqual(src2);
+            });
+        });
+
+        describe("js非阻塞同步加载loadSync", function () {
+            beforeEach(function () {
+            });
+            afterEach(function () {
+            });
+
+            it("能够正常加载单个js文件时", function () {
+                jsLoader.add(src1);
+
+                jsLoader.loadSync();
+
+                testTool.asynRun(function () {
+                    expect(window.jsLoader_forTest).toEqual(100);
+
+                    testTool.deleteMember(window, "jsLoader_forTest");
+                }, 300);
+            });
+            it("加载多个js文件时，按照加入的顺序依次加载", function () {
+                jsLoader.add(src1).add(src2);
+
+                jsLoader.loadSync();
+
+                testTool.asynRun(function () {
+                    expect(window.jsLoader_forTest).toEqual(101);
+
+                    testTool.deleteMember(window, "jsLoader_forTest");
+                }, 300);
+            });
+            it("onload钩子会在加载完所有js文件后触发", function () {
+                jsLoader.add(src1).add(src2);
+                jsLoader.onload = function () {
+                    window.jsLoader_forTest *= 2;
+                };
+
+                jsLoader.loadSync();
+
+                testTool.asynRun(function () {
+                    expect(window.jsLoader_forTest).toEqual(202);
+
+                    testTool.deleteMember(window, "jsLoader_forTest");
+                }, 300);
+            });
         });
     });
 
@@ -40,7 +143,7 @@ describe("Main", function () {
                 namespace_forTest = "ye_namespace_forTest";
             });
             afterEach(function () {
-                testTool.deleteMember(window,  namespace_forTest);
+                testTool.deleteMember(window, namespace_forTest);
             });
 
             it("测试namespace方法存在", function () {
@@ -97,17 +200,17 @@ describe("Main", function () {
         var config = null;
 
         it("保存配置", function () {
-            config = {debug: true};
+            config = {isDebug: true};
 
             main.setConfig(config);
 
             var _config = main.getConfig();
-            expect(_config.debug).toBeTruthy();
+            expect(_config.isDebug).toBeTruthy();
         });
 
         describe("如果配置为自动加载，则在dom加载完成后加载引擎和用户文件", function () {
             beforeEach(function () {
-                config = {loadWhenDomReady: true};
+                config = {isLoadWhenDomReady: true};
             });
             afterEach(function () {
             });
@@ -128,9 +231,11 @@ describe("Main", function () {
                     var engineDir = "../script/yEngine/",
                         engineFilePaths = ["a.js", "a/b.js"],
                         userFilePaths = ["c.js", "../d.js"],
-                        jsLoader = main.forTest_getJsLoader();
-                    sandbox.stub(jsLoader, "add");
-                    sandbox.stub(jsLoader, "loadSync");
+                        fakeJsLoader = {
+                            add: sandbox.stub(),
+                            loadSync: sandbox.stub()
+                        };
+                    sandbox.stub(main.forTest_getJsLoader(), "create").returns(fakeJsLoader);
                     config.engineDir = engineDir;
                     config.engineFilePaths = engineFilePaths;
                     config.userFilePaths = userFilePaths;
@@ -139,20 +244,22 @@ describe("Main", function () {
                     main.setConfig(config);
                     window.addEventListener.getCall(0).callArg(1);
 
-                    expect(jsLoader.add.withArgs(engineDir + engineFilePaths[0]).calledOnce).toBeTruthy();
-                    expect(jsLoader.add.withArgs(engineDir + engineFilePaths[1]).calledOnce).toBeTruthy();
-                    expect(jsLoader.add.withArgs(userFilePaths[0]).calledOnce).toBeTruthy();
-                    expect(jsLoader.add.withArgs(userFilePaths[1]).calledOnce).toBeTruthy();
-                    expect(jsLoader.loadSync.calledAfter(jsLoader.add)).toBeTruthy();
+                    expect(fakeJsLoader.add.withArgs(engineDir + engineFilePaths[0]).calledOnce).toBeTruthy();
+                    expect(fakeJsLoader.add.withArgs(engineDir + engineFilePaths[1]).calledOnce).toBeTruthy();
+                    expect(fakeJsLoader.add.withArgs(userFilePaths[0]).calledOnce).toBeTruthy();
+                    expect(fakeJsLoader.add.withArgs(userFilePaths[1]).calledOnce).toBeTruthy();
+                    expect(fakeJsLoader.loadSync.calledAfter(fakeJsLoader.add)).toBeTruthy();
                 });
             });
             it("文件加载完成后，调用配置的onload方法", function () {
                 var fakeOnLoad = sandbox.stub();
+                var fakeJsLoader = {};
+                sandbox.stub(main.forTest_getJsLoader(), "create").returns(fakeJsLoader);
                 config.onload = fakeOnLoad;
 
                 main.setConfig(config);
 
-                expect(main.forTest_getJsLoader().onload).toEqual(fakeOnLoad);
+                expect(fakeJsLoader.onload).toEqual(fakeOnLoad);
             });
         });
     });
@@ -165,7 +272,7 @@ describe("Main", function () {
         });
 
         it("如果已配置为DOM加载完成后自动加载文件，则提示并不进行加载", function () {
-            main.ye_config.loadWhenDomReady = true;
+            main.ye_config.isLoadWhenDomReady = true;
 
             var result = main.load();
 
@@ -173,7 +280,7 @@ describe("Main", function () {
             expect(result).toBeFalsy();
         });
         it("如果已经加载过文件，则提示并不进行加载", function () {
-            main.ye_config.loadWhenDomReady = false;
+            main.ye_config.isLoadWhenDomReady = false;
 
             var result = main.load();
 

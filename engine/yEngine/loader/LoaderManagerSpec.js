@@ -152,7 +152,7 @@ describe("LoaderManager", function () {
 
             it("否则，断言", function () {
                 sandbox.stub(YE.main, "getConfig").returns({
-                    debug: true
+                    isDebug: true
                 });
 
                 expect(function () {
