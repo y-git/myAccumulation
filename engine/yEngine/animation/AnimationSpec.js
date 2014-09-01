@@ -110,11 +110,11 @@ describe("Animation", function () {
             expect(frame2.copy.calledOnce).toBeTruthy();
         });
         it("拷贝config", function () {
-            sandbox.stub(YYC.Tool.extend, "extend");
+            sandbox.stub(YE.Tool.extend, "extend");
 
             animation.copy();
 
-            expect(YYC.Tool.extend.extend.calledOnce).toBeTruthy();
+            expect(YE.Tool.extend.extend.calledOnce).toBeTruthy();
         });
         it("创建animation实例并返回", function () {
             var result = animation.copy();

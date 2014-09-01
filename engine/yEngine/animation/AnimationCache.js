@@ -28,7 +28,7 @@
             }
         },
         Public: {
-            createAnim: function (startFrameName, endFrameName, config) {
+            createAnim: function (startFrameName, endFrameName, animData) {
                 var startIndex = null,
                     endIndex = null,
                     animPrex = null,
@@ -37,19 +37,21 @@
                     animation = null,
                     animate = null,
                     frames = null,
-                    _config = {
+                    _animData = {
                         duration: 0.1,
                         flipX: false,
                         flipY: false,
                         pixelOffsetX: 0,
                         pixelOffsetY: 0,
-                        repeatNum: -1
+                        repeatNum: -1,
+                        width: null,
+                        height: null
                     } ,
                     i = 0;
 
                 if (arguments.length === 1) {
                     frames = arguments[0].frames;
-                    YYC.Tool.extend.extendExist(_config, arguments[0]);
+                    YE.Tool.extend.extendExist(_animData, arguments[0]);
 
                     frames.forEach(function (frame) {
                         animFrames.push(YE.FrameCache.getInstance().getFrame(frame));
@@ -57,7 +59,7 @@
                 }
                 else if (arguments.length === 2) {
                     animFrames = [YE.FrameCache.getInstance().getFrame(arguments[0])];
-                    YYC.Tool.extend.extend(_config, arguments[1]);
+                    YE.Tool.extend.extendExist(_animData, arguments[1]);
                 }
                 else if (arguments.length === 3) {
                     startIndex = startFrameName.substring(startFrameName.search(/\d+$/), startFrameName.length);
@@ -73,23 +75,25 @@
                         animFrames.push(YE.FrameCache.getInstance().getFrame(this.ye_buildFrameName(animPrex, numberLen, i)));
                     }
 
-                    YYC.Tool.extend.extend(_config, config);
+                    YE.Tool.extend.extendExist(_animData, animData);
                 }
 
                 animation = YE.Animation.create(animFrames, {
-                    duration: _config.duration,
-                    flipX: _config.flipX,
-                    flipY: _config.flipY,
-                    pixelOffsetX: _config.pixelOffsetX,
-                    pixelOffsetY: _config.pixelOffsetY
+                    duration: _animData.duration,
+                    flipX: _animData.flipX,
+                    flipY: _animData.flipY,
+                    pixelOffsetX: _animData.pixelOffsetX,
+                    pixelOffsetY: _animData.pixelOffsetY
                 });
 
-                if (_config.repeatNum === -1) {
+                if (_animData.repeatNum === -1) {
                     animate = YE.RepeatForever.create(YE.Animate.create(animation));
                 }
                 else {
-                    animate = YE.Repeat.create(YE.Animate.create(animation), _config.repeatNum);
+                    animate = YE.Repeat.create(YE.Animate.create(animation), _animData.repeatNum);
                 }
+
+                animate.setCacheData([_animData.width, _animData.height]);
 
                 return animate;
             },

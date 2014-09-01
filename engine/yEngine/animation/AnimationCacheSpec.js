@@ -42,17 +42,21 @@ describe("AnimationCache", function () {
     describe("createAnim", function () {
         var frameCache = null,
             fakeFrame = {},
-            config = null;
+            fakeAnimate = null,
+            animData = null;
 
         beforeEach(function () {
             frameCache = {
                 getFrame: sandbox.stub().returns(fakeFrame)
             };
             sandbox.stub(YE.FrameCache, "getInstance").returns(frameCache);
+            fakeAnimate = {
+                setCacheData: sandbox.stub()
+            };
             sandbox.stub(YE.Animation, "create");
             sandbox.stub(YE.Animate, "create");
-            sandbox.stub(YE.Repeat, "create");
-            sandbox.stub(YE.RepeatForever, "create");
+            sandbox.stub(YE.Repeat, "create").returns(fakeAnimate);
+            sandbox.stub(YE.RepeatForever, "create").returns(fakeAnimate);
         });
 
         describe("生成帧数组", function () {
@@ -77,18 +81,18 @@ describe("AnimationCache", function () {
                     expect(frames[0]).toEqual(fakeFrame);
                     expect(frames[1]).toEqual(fakeFrame);
                 });
-                it("获得config", function () {
+                it("获得动画数据", function () {
                     var frameData = {frames: [], a: 1, b: {}};
-                    sandbox.stub(YYC.Tool.extend, "extendExist");
+                    sandbox.stub(YE.Tool.extend, "extendExist");
 
                     cache.createAnim(frameData);
 
-                    expect(YYC.Tool.extend.extendExist.callsArgWith(1, frameData)).toBeTruthy();
+                    expect(YE.Tool.extend.extendExist.args[0][1]).toEqual(frameData);
                 });
             });
 
 
-            describe("如果参数为frameName, config", function () {
+            describe("如果参数为frameName, animData", function () {
                 beforeEach(function () {
                 });
                 afterEach(function () {
@@ -102,17 +106,17 @@ describe("AnimationCache", function () {
                     expect(frameCache.getFrame.firstCall.args[0]).toEqual("aaa");
                     expect(frames[0]).toEqual(fakeFrame);
                 });
-                it("获得config", function () {
-                    var config = {};
-                    sandbox.stub(YYC.Tool.extend, "extend");
+                it("获得动画数据", function () {
+                    var animData = {};
+                    sandbox.stub(YE.Tool.extend, "extendExist");
 
-                    cache.createAnim("aaa", config);
+                    cache.createAnim("aaa", animData);
 
-                    expect(YYC.Tool.extend.extend.callsArgWith(1, config)).toBeTruthy();
+                    expect(YE.Tool.extend.extendExist.args[0][1]).toEqual(animData);
                 });
             });
 
-            describe("如果参数为startFrameName, endFrameName, config", function () {
+            describe("如果参数为startFrameName, endFrameName, animData", function () {
                 var startAnimName = null,
                     endAnimName = null;
 
@@ -121,25 +125,31 @@ describe("AnimationCache", function () {
                     endAnimName = "aaa_025";
                 });
 
-
                 it("测试生成帧的名字", function () {
-                    cache.createAnim(startAnimName, endAnimName, config);
+                    cache.createAnim(startAnimName, endAnimName, animData);
 
                     expect(frameCache.getFrame.getCall(1).args[0]).toEqual("aaa_002");
                     expect(frameCache.getFrame.getCall(22).args[0]).toEqual("aaa_023");
                 });
                 it("生成startAnimName到endAnimName的帧数组", function () {
-                    cache.createAnim(startAnimName, endAnimName, config);
+                    cache.createAnim(startAnimName, endAnimName, animData);
 
                     var frames = getFrames();
                     expect(frames.length).toEqual(25);
                     expect(frames[0]).toEqual(fakeFrame);
                 });
+                it("获得动画数据", function () {
+                    sandbox.stub(YE.Tool.extend, "extendExist");
+
+                    cache.createAnim(startAnimName, endAnimName, animData);
+
+                    expect(YE.Tool.extend.extendExist.args[0][1]).toEqual(animData);
+                });
             });
         });
 
         it("创建animation，传入配置项", function () {
-            var config = {
+            var animData = {
                 duration: 0.5,
                 flipX: true,
                 flipY: true,
@@ -148,7 +158,7 @@ describe("AnimationCache", function () {
                 repeatNum: 10
             };
 
-            cache.createAnim("", "", config);
+            cache.createAnim("", "", animData);
 
             expect(YE.Animation.create.lastCall.args[1]).toEqual({
                 duration: 0.5,
@@ -158,12 +168,7 @@ describe("AnimationCache", function () {
                 pixelOffsetY: 20
             });
         });
-        it("根据config.repeatNum，创建对应动画并返回", function () {
-            var fakeAnim = {};
-            var config = {
-                repeatNum: -1
-            };
-
+        it("根据animData.repeatNum，创建对应动画并返回", function () {
             cache.createAnim("", "", {
                 repeatNum: -1
             });
@@ -173,6 +178,18 @@ describe("AnimationCache", function () {
 
             expect(YE.RepeatForever.create.calledOnce).toBeTruthy();
             expect(YE.Repeat.create.firstCall.args[1]).toEqual(10);
+        });
+        it("动画保存动画数据的width和height到缓存中", function () {
+            var width = 100,
+                height = 200;
+
+            cache.createAnim("", "", {
+                repeatNum: -1,
+                width: width,
+                height: height
+            });
+
+            expect(fakeAnimate.setCacheData.calledWith([width, height])).toBeTruthy();
         });
     });
 

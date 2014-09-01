@@ -73,7 +73,7 @@
                         break;
                 }
 
-                if (mimeType == 'mp3' && YYC.Tool.judge.browser.isFF()) {
+                if (mimeType == 'mp3' && YE.Tool.judge.browser.isFF()) {
                     return false;
                 }
 
@@ -111,10 +111,10 @@
                  An element must be reloaded in Chrome or it will only play once
                  An element must not be reloaded in Firefox or there will be a delay*/
                 this.ye_audio.addEventListener("ended", function () {
-                    if (YYC.Tool.judge.browser.isChrome()) {
+                    if (YE.Tool.judge.browser.isChrome()) {
                         this.load();
                     }
-                    else if (YYC.Tool.judge.browser.isFF()) {
+                    else if (YE.Tool.judge.browser.isFF()) {
                         this.currentTime = 0;
                     }
                     else {

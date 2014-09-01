@@ -7,9 +7,10 @@
  */
 (function () {
     namespace("YE").Animate = YYC.Class({Interface: YE.IAnimationAction, Class: YE.ActionInterval}, {
-        Init: function () {
+        Init: function (animation) {
             this.base();
 
+            this.ye___anim = animation;
             this.ye___frames = YE.Collection.create();
         },
         Private: {
@@ -38,8 +39,7 @@
             getCurrentFrame: function () {
                 return this.ye___currentFrame;
             },
-            initWhenCreate: function (animation) {
-                this.ye___anim = animation;
+            initWhenCreate: function () {
                 this.ye___frames.addChilds(this.ye___anim.getFrames());
                 this.ye___duration = this.ye___anim.getDurationPerFrame();
                 this.ye___frameCount = this.ye___frames.getCount();
@@ -96,8 +96,8 @@
         },
         Static: {
             create: function (animation) {
-                var animate = new YE.Animate();
-                animate.initWhenCreate(animation);
+                var animate = new YE.Animate(animation);
+                animate.initWhenCreate();
 
                 return animate;
             }

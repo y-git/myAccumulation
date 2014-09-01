@@ -8,12 +8,15 @@
 describe("JsonLoader", function () {
     var loader = null,
         Loader = YE.JsonLoader;
+    var sandbox = null;
 
     beforeEach(function () {
+        sandbox = sinon.sandbox.create();
         loader = Loader.getInstance();
     });
     afterEach(function () {
         Loader.forTest_clearInstance();
+        sandbox.restore();
     });
 
     describe("该类为单例类", function () {
@@ -25,7 +28,7 @@ describe("JsonLoader", function () {
             var fakeJsonData = {
                 frames: {}
             };
-            spyOn(loader.ye_P_container, "getValue").andReturn(fakeJsonData);
+            sandbox.stub(loader.ye_P_container, "getValue").returns(fakeJsonData);
 
             var data = loader.get("../a.json");
 
@@ -36,14 +39,14 @@ describe("JsonLoader", function () {
     describe("ye_P_load", function () {
         describe("异步读取json文件", function () {
             beforeEach(function () {
-                spyOn(loader.ye_P_container, "hasChild").andReturn(false);
-                spyOn($, "ajax");
+                sandbox.stub(loader.ye_P_container, "hasChild").returns(false);
+                $.ajax = sandbox.stub();
             });
 
             it("调用jquery的ajax方法，异步访问", function () {
                 loader.ye_P_load("../a.json");
 
-                expect($.ajax.mostRecentCall.args[0].async).toBeTruthy();
+                expect($.ajax.lastCall.args[0].async).toBeTruthy();
             });
 
             describe("如果成功获得数据", function () {
@@ -51,32 +54,40 @@ describe("JsonLoader", function () {
                     var fakeData = {frames: {}},
                         jsonPath = "../a.json",
                         fakeId = "a";
-                    spyOn(loader.ye_P_container, "add");
+                    sandbox.stub(loader.ye_P_container, "add");
 
                     loader.ye_P_load(jsonPath, fakeId);
 
-                    $.ajax.mostRecentCall.args[0].success(fakeData);
-                    expect(loader.ye_P_container.add).toHaveBeenCalledWith(fakeId, fakeData);
+                    $.ajax.lastCall.args[0].success(fakeData);
+                    expect(loader.ye_P_container.add.calledWith(fakeId, fakeData)).toBeTruthy();
                 });
                 it("调用LoaderManager的onResLoaded方法", function () {
-                    var fakeLoaderManager = jasmine.createSpyObj("", ["onResLoaded"]);
-                    spyOn(YE.LoaderManager, "getInstance").andReturn(fakeLoaderManager);
+                    var fakeLoaderManager = {
+                        onResLoaded: sandbox.stub()
+                    };
+                    sandbox.stub(YE.LoaderManager, "getInstance").returns(fakeLoaderManager);
 
                     loader.ye_P_load("");
 
-                    $.ajax.mostRecentCall.args[0].success({});
-                    expect(fakeLoaderManager.onResLoaded).toHaveBeenCalled();
+                    $.ajax.lastCall.args[0].success({});
+                    expect(fakeLoaderManager.onResLoaded.calledOnce).toBeTruthy();
                 });
             });
 
             it("如果加载失败，调用LoaderManager的onResError方法", function () {
-                var fakeLoaderManager = jasmine.createSpyObj("", ["onResError"]);
-                spyOn(YE.LoaderManager, "getInstance").andReturn(fakeLoaderManager);
+                var fakeLoaderManager = {
+                    onResError: sandbox.stub()
+                };
+                sandbox.stub(YE.LoaderManager, "getInstance").returns(fakeLoaderManager);
 
                 loader.ye_P_load("");
 
-                $.ajax.mostRecentCall.args[0].error({readyState: 404, status: 4, responseText: ""});
-                expect(fakeLoaderManager.onResError).toHaveBeenCalled();
+                $.ajax.lastCall.args[0].error(
+                    {readyState: 404, status: 4, responseText: ""},
+                    "",
+                    {message: "error"}
+                );
+                expect(fakeLoaderManager.onResError.calledOnce).toBeTruthy();
             });
         });
     });

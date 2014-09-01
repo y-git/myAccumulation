@@ -1,7 +1,7 @@
 ﻿//Array.prototype.remove = function (obj) {
 //    var index = this.indexOf(function (e) {
 //        console.log(e);
-//        return YYC.Tool.judge.isEqual(e, obj);
+//        return YE.Tool.judge.isEqual(e, obj);
 //    });
 //    console.log("index = ", index);
 

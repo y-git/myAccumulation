@@ -157,7 +157,7 @@
             preload: (function () {
                 var preload = null;
 
-                if (YYC.Tool.judge.browser.isIE()) {
+                if (YE.Tool.judge.browser.isIE()) {
                     preload = function (fileSrc) {
                         new Image().src = fileSrc;  //灯塔模式
                     };
@@ -182,7 +182,7 @@
         /**
          * 创建命名空间。
          示例：
-         namespace("YYC.Tool.Button");
+         namespace("YE.Tool.Button");
          */
         var global = {
             namespace: function (str) {

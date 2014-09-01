@@ -154,11 +154,11 @@ describe("Spawn", function () {
         });
 
         it("动作序列要进行拷贝", function () {
-            sandbox.stub(YYC.Tool.extend, "extendDeep");
+            sandbox.stub(YE.Tool.extend, "extendDeep");
 
             var c = action.copy();
 
-            expect(YYC.Tool.extend.extendDeep.calledWith(one.concat([two]))).toBeTruthy();
+            expect(YE.Tool.extend.extendDeep.calledWith(one.concat([two]))).toBeTruthy();
         });
         it("返回动作副本", function () {
             var c = action.copy();

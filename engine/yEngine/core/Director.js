@@ -141,7 +141,7 @@
             end: function () {
                 this.ye_endLoop();
 //                this.ye_gameStatus = GameStatus.END;
-                YYC.Tool.asyn.clearAllTimer(this.ye_timerIndex);
+                YE.Tool.asyn.clearAllTimer(this.ye_timerIndex);
             },
             pause: function () {
                 if (this.ye_gameStatus === GameStatus.PAUSE) {

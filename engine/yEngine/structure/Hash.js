@@ -20,7 +20,7 @@
                 return this;
             },
             append: function (key, value) {
-                if(YYC.Tool.judge.isArray(this.ye_childs[key])){
+                if(YE.Tool.judge.isArray(this.ye_childs[key])){
                     this.ye_childs[key].push(value);
                 }
                 else{

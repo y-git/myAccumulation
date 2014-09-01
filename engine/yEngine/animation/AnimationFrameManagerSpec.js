@@ -23,22 +23,24 @@ describe("AnimationFrameManager", function () {
 
     describe("构造函数", function () {
         it("创建AnimationFrame实例", function () {
-            spyOn(YE.AnimationFrame, "create");
+            sandbox.stub(YE.AnimationFrame, "create");
 
-            var manager = getInstance();
+            manager.Init();
 
-            expect(YE.AnimationFrame.create).toHaveBeenCalled();
+            expect(YE.AnimationFrame.create.calledOnce).toBeTruthy();
         });
     });
 
     describe("getAnim", function () {
         it("获得指定动画", function () {
             var fakeAnim = {};
-            manager.ye_animationFrame = testTool.spyReturn("getAnim", fakeAnim);
+            sandbox.stub(manager, "ye_animationFrame", {
+                getAnim: sandbox.stub().returns(fakeAnim)
+            });
 
             var anim = manager.getAnim("walk");
 
-            expect(manager.ye_animationFrame.getAnim).toHaveBeenCalledWith("walk");
+            expect(manager.ye_animationFrame.getAnim.calledWith("walk")).toBeTruthy();
             expect(anim).toEqual(fakeAnim);
         });
     });
@@ -61,19 +63,24 @@ describe("AnimationFrameManager", function () {
         var fakeAnim = null;
 
         beforeEach(function () {
-            manager.ye_animationFrame = jasmine.createSpyObj("", ["addAnim"]);
-            fakeAnim = jasmine.createSpyObj("", ["setTag"]);
+            sandbox.stub(manager, "ye_animationFrame", {
+                addAnim: sandbox.stub()
+            });
+
+            fakeAnim = {
+                setTag: sandbox.stub()
+            };
         });
 //                it("如果加入的是action动画，则直接将动画数据保存到animationFrame中", function () {
         it("设置动画的tag为动画名", function () {
             manager.addAnim("walk", fakeAnim);
 
-            expect(fakeAnim.setTag).toHaveBeenCalledWith("walk");
+            expect(fakeAnim.setTag.calledWith("walk")).toBeTruthy();
         });
         it("将动画数据保存到animationFrame中", function () {
             manager.addAnim("walk", fakeAnim);
 
-            expect(manager.ye_animationFrame.addAnim).toHaveBeenCalledWith("walk", fakeAnim);
+            expect(manager.ye_animationFrame.addAnim.calledWith("walk", fakeAnim)).toBeTruthy();
         });
 //                it("否则，如果加入的是动画的帧数据，则生成action动画，并保存到animationFrame中", function () {
 //                    var frames = [
@@ -92,48 +99,59 @@ describe("AnimationFrameManager", function () {
     });
 //
     describe("管理动画", function () {
-        var fakeAnim = null,
-            fakeActionManager = null;
+        var fakeAnim = null;
 
         function initAnim(spyMethods) {
-            fakeAnim = jasmine.createSpyObj("", spyMethods);
-            testTool.spyReturn(manager, "getAnim", fakeAnim);
+            fakeAnim = sandbox.createSpyObj.apply(sandbox, spyMethods);
+            sandbox.stub(manager, "getAnim").returns(fakeAnim);
+
         }
 
         describe("initAndReturnAnim", function () {
             var animName = "walk";
 
+
             beforeEach(function () {
-                initAnim(["start", "setCacheData"]);
+                initAnim(["start", "setCacheData", "getCacheData"]);
+                fakeAnim.getCacheData = sandbox.stub().returns([]);
             });
 
             it("如果第一个参数为动画名，则获得内部对应的动画", function () {
-                manager.initAndReturnAnim(animName);
+                manager.initAndReturnAnim(animName, []);
 
-                expect(manager.getAnim).toHaveBeenCalledWith(animName);
+                expect(manager.getAnim.calledWith(animName)).toBeTruthy();
             });
             it("如果第一个参数为动画（Action类型），则直接对该动画进行初始化并返回", function () {
-                var fakeAnim = jasmine.createSpyObj("", ["start", "setCacheData"]);
+//                var fakeAnim = sandbox.createSpyObj("start", "setCacheData", "getCacheData");
 
-                var anim = manager.initAndReturnAnim(fakeAnim);
+                var anim = manager.initAndReturnAnim(fakeAnim, []);
 
                 expect(anim).toEqual(fakeAnim);
             });
-            it("保存动画绘制数据", function () {
-                manager.initAndReturnAnim(animName, [1, 2, 3, 4]);
 
-                expect(fakeAnim.setCacheData).toHaveBeenCalledWith([1, 2, 3, 4]);
+            describe("保存动画绘制数据", function () {
+                it("保存动画绘制数据", function () {
+                    var spriteData = [1, 2, 3, 4];
+
+                    manager.initAndReturnAnim(animName, spriteData);
+
+                    expect(fakeAnim.setCacheData.calledWith(spriteData)).toBeTruthy();
+                });
+                it("如果动画绘制数据中没有指定显示大小，则从动画的缓存数据中获得显示大小", function () {
+                    var spriteData = [1, 2, undefined, undefined];
+                    fakeAnim.getCacheData = sandbox.stub().returns([100, 200]);
+
+                    manager.initAndReturnAnim(animName, spriteData);
+
+                    expect(fakeAnim.setCacheData.calledWith([1, 2, 100, 200])).toBeTruthy();
+                });
             });
+
             it("启动动画", function () {
-                manager.initAndReturnAnim(animName);
+                manager.initAndReturnAnim(animName, []);
 
-                expect(fakeAnim.start).toHaveBeenCalled();
+                expect(fakeAnim.start.calledOnce).toBeTruthy();
             });
-//            it("保存对动画的引用", function () {
-//                manager.initAndReturnAnim(animName);
-//
-//                expect(manager.ye_recentAnim).toEqual(fakeAnim);
-//            });
         });
 
         describe("resetAnim", function () {
@@ -142,7 +160,7 @@ describe("AnimationFrameManager", function () {
 
                 manager.resetAnim("walk");
 
-                expect(fakeAnim.reset).toHaveBeenCalled();
+                expect(fakeAnim.reset.calledOnce).toBeTruthy();
             });
         });
 
@@ -152,7 +170,7 @@ describe("AnimationFrameManager", function () {
 
                 manager.stopAnim();
 
-                expect(fakeAnim.stop).toHaveBeenCalled();
+                expect(fakeAnim.stop.calledOnce).toBeTruthy();
             });
         });
 
@@ -162,7 +180,7 @@ describe("AnimationFrameManager", function () {
 
                 manager.startAnim();
 
-                expect(fakeAnim.start).toHaveBeenCalled();
+                expect(fakeAnim.start.calledOnce).toBeTruthy();
             });
         });
     });

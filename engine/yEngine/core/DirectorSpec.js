@@ -292,12 +292,12 @@ describe("Director", function () {
         });
         it("停止所有计时器", function () {
             var index = 10;
-            sandbox.stub(YYC.Tool.asyn, "clearAllTimer");
+            sandbox.stub(YE.Tool.asyn, "clearAllTimer");
             director.setTimerIndex(index);
 
             director.end();
 
-            expect(YYC.Tool.asyn.clearAllTimer.calledWith(index)).toBeTruthy();
+            expect(YE.Tool.asyn.clearAllTimer.calledWith(index)).toBeTruthy();
         });
     });
 

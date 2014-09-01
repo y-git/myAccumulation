@@ -30,7 +30,8 @@
                     error: function (XMLHttpRequest, textStatus, errorThrown) {
                         YE.LoaderManager.getInstance().onResError(jsonFilePath,
                             "readyState:" + XMLHttpRequest.readyState + "\nstatus:" + XMLHttpRequest.status
-                                + "\ninfo:" + XMLHttpRequest.responseText);
+                                + "\nmessage:" + errorThrown.message
+                                + "\nresponseText:" +XMLHttpRequest.responseText);
                     }
                 });
             }

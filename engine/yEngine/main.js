@@ -174,7 +174,7 @@
         /**
          * 创建命名空间。
          示例：
-         namespace("YYC.Tool.Button");
+         namespace("YE.Tool.Button");
          */
         var global = {
             namespace: function (str) {

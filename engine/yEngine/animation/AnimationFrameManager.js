@@ -14,19 +14,32 @@ namespace("YE").AnimationFrameManager = YYC.Class(YE.Entity, {
     Private: {
 //        ye_actionManager: null,
 //        ye_recentAnim: null,
-        ye_animationFrame: null
+        ye_animationFrame: null,
+
+        ye_setAnimSize: function (spriteData, anim) {
+            var data = anim.getCacheData();
+
+            spriteData[2] = spriteData[2] === undefined ? data[0] : spriteData[2];
+            spriteData[3] = spriteData[3] === undefined ? data[1] : spriteData[3];
+        }
     },
     Public: {
         initAndReturnAnim: function (animName, spriteData) {
             var anim = null;
 
-            if (YYC.Tool.judge.isString(arguments[0])) {
+            if (YE.Tool.judge.isString(arguments[0])) {
                 anim = this.getAnim(arguments[0]);
             }
             else {
                 anim = arguments[0];
             }
+
+            //AnimationCache->createAnim中将动画json数据中的width、height（显示大小）保存到动画cacheData中，
+            //此处将spriteData数据（精灵坐标、精灵动画指定显示大小（Sprite->runAnim中指定的动画数据））合并到动画cacheData中
+            //从而在Sprite->ye___drawAnims中调用anim.getCacheData()时，获得动画的精灵坐标、精灵动画指定显示大小
+            this.ye_setAnimSize(spriteData, anim);
             anim.setCacheData(spriteData);
+
             anim.start();
 //            this.ye_recentAnim = anim;
 

@@ -36,7 +36,7 @@ namespace("YE").CallFunc = YYC.Class(YE.Action, {
             this.finish();
         },
         copy: function () {
-            var dataArr = YYC.Tool.extend.extendDeep(this.__dataArr);
+            var dataArr = YE.Tool.extend.extendDeep(this.__dataArr);
             var action = new YE.CallFunc(this.__context, this.__callFunc, dataArr);
 
             return action;

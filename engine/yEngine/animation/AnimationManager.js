@@ -13,7 +13,7 @@ namespace("YE").AnimationManager = YYC.Class(YE.CollectionManager, {
         hasChild: function (child) {
             var animName = null;
 
-            if (YYC.Tool.judge.isString(arguments[0])) {
+            if (YE.Tool.judge.isString(arguments[0])) {
                 animName = arguments[0];
 
                 return this.ye_P_childs.hasChild(function (c) {

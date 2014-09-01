@@ -42,8 +42,8 @@ describe("main", function () {
 
         beforeEach(function () {
             jsLoader = main.forTest_getJsLoader().create();
-            src1 = YYC.Tool.path.getJsDir("main.js") + "testJs1.js";
-            src2 = YYC.Tool.path.getJsDir("main.js") + "testJs2.js";
+            src1 = YE.Tool.path.getJsDir("main.js") + "testJs1.js";
+            src2 = YE.Tool.path.getJsDir("main.js") + "testJs2.js";
         });
         afterEach(function () {
             $("head script[src*=testJs1\\.js]").remove();

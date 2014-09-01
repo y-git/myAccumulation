@@ -46,7 +46,7 @@
                     frames.push(frame.copy());
                 });
 
-                return YE.Animation.create(frames, YYC.Tool.extend.extend({}, this.ye_config));
+                return YE.Animation.create(frames, YE.Tool.extend.extend({}, this.ye_config));
             },
             getFrames: function () {
                 return this.ye_frames;

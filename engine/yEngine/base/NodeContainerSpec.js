@@ -23,10 +23,6 @@ describe("NodeContainer", function () {
         return new T();
     }
 
-    function buildFakeChild(methods) {
-        return jasmine.createSpyObj("", methods);
-    }
-
     beforeEach(function () {
         container = getInstance();
         sandbox = sinon.sandbox.create();
@@ -47,7 +43,7 @@ describe("NodeContainer", function () {
         var child = null;
 
         beforeEach(function () {
-            child = buildFakeChild(["ye_P_setZOrder"]);
+            child = sandbox.createSpyObj("ye_P_setZOrder");
             container.forTest_addChild(child);
         });
 
@@ -59,7 +55,7 @@ describe("NodeContainer", function () {
         it("设置元素的zOrder", function () {
             container.reorderChild(child, 1);
 
-            expect(child.ye_P_setZOrder).toHaveBeenCalledWith(1);
+            expect(child.ye_P_setZOrder.calledOnce).toBeTruthy();
         });
     });
 
@@ -71,10 +67,10 @@ describe("NodeContainer", function () {
             });
 
             it("按元素的zOrder排序", function () {
-                var child1 = buildFakeChild(["a"]),
-                    child2 = buildFakeChild(["b"]),
-                    child3 = buildFakeChild(["c"]),
-                    child4 = buildFakeChild(["d"]);
+                var child1 = sandbox.createSpyObj("a"),
+                    child2 = sandbox.createSpyObj("b"),
+                    child3 = sandbox.createSpyObj("c"),
+                    child4 = sandbox.createSpyObj("d");
                 child1.getZOrder = function () {
                     return 0;
                 };
@@ -112,8 +108,8 @@ describe("NodeContainer", function () {
     });
 
     describe("加入元素", function () {
-        function buildFakeChild(methods) {
-            return testTool.buildFakeObj(["init", "ye_P_setZOrder", "onenter", "addTag"], methods);
+        function buildFakeChild() {
+            return  sandbox.createSpyObj("init", "ye_P_setZOrder","onenter", "addTag");
         }
 
         describe("addChilds", function () {
@@ -148,34 +144,34 @@ describe("NodeContainer", function () {
                 it("设置元素的zOrder", function () {
                     container.addChilds([fakeElement1, fakeElement2], 1);
 
-                    expect(fakeElement1.ye_P_setZOrder.calls[0].args[0]).toEqual(1);
-                    expect(fakeElement2.ye_P_setZOrder.calls[0].args[0]).toEqual(1);
+                    expect(fakeElement1.ye_P_setZOrder.calledWith(1)).toBeTruthy();
+                    expect(fakeElement2.ye_P_setZOrder.calledWith(1)).toBeTruthy();
                 });
             });
 
             it("否则，不设置ZOrder", function () {
                 container.addChilds([fakeElement1, fakeElement2]);
 
-                expect(fakeElement1.ye_P_setZOrder).not.toHaveBeenCalled();
-                expect(fakeElement2.ye_P_setZOrder).not.toHaveBeenCalled();
+                expect(fakeElement1.ye_P_setZOrder.called).toBeFalsy();
+                expect(fakeElement2.ye_P_setZOrder.called).toBeFalsy();
             });
             it("如果传入了tag，则设置元素tag", function () {
                 container.addChilds([fakeElement1, fakeElement2], 0, "a");
 
-                expect(fakeElement1.addTag).toHaveBeenCalled();
-                expect(fakeElement2.addTag).toHaveBeenCalled();
+                expect(fakeElement1.addTag.calledOnce).toBeTruthy();
+                expect(fakeElement2.addTag.calledOnce).toBeTruthy();
             });
             it("初始化元素", function () {
                 container.addChilds([fakeElement1, fakeElement2]);
 
-                expect(fakeElement1.init).toHaveBeenCalledWith(container);
-                expect(fakeElement2.init).toHaveBeenCalledWith(container);
+                expect(fakeElement1.init.calledWith(container)).toBeTruthy();
+                expect(fakeElement2.init.calledWith(container)).toBeTruthy();
             });
             it("调用元素的onenter", function () {
                 container.addChilds([fakeElement1, fakeElement2]);
 
-                expect(fakeElement1.onenter).toHaveBeenCalledWith();
-                expect(fakeElement2.onenter).toHaveBeenCalledWith();
+                expect(fakeElement1.onenter.calledOnce).toBeTruthy();
+                expect(fakeElement2.onenter.calledOnce).toBeTruthy();
             });
         });
 
@@ -201,29 +197,29 @@ describe("NodeContainer", function () {
                 it("设置元素的zOrder", function () {
                     container.addChild(fakeElement, 1);
 
-                    expect(fakeElement.ye_P_setZOrder.calls[0].args[0]).toEqual(1);
+                    expect(fakeElement.ye_P_setZOrder.calledWith(1)).toBeTruthy();
                 });
             });
 
             it("否则，不设置ZOrder", function () {
                 container.addChild(fakeElement);
 
-                expect(fakeElement.ye_P_setZOrder).not.toHaveBeenCalled();
+                expect(fakeElement.ye_P_setZOrder.called).toBeFalsy();
             });
             it("如果传入了tag，则设置元素tag", function () {
                 container.addChild(fakeElement, 0, "a");
 
-                expect(fakeElement.addTag).toHaveBeenCalled();
+                expect(fakeElement.addTag.calledOnce).toBeTruthy();
             });
             it("初始化元素", function () {
                 container.addChild(fakeElement);
 
-                expect(fakeElement.init).toHaveBeenCalledWith(container);
+                expect(fakeElement.init.calledOnce).toBeTruthy();
             });
             it("调用元素的onenter", function () {
                 container.addChild(fakeElement);
 
-                expect(fakeElement.onenter).toHaveBeenCalledWith();
+                expect(fakeElement.onenter.calledOnce).toBeTruthy();
             });
         });
     });
@@ -283,17 +279,17 @@ describe("NodeContainer", function () {
         });
 
         it("调用精灵onexit", function () {
-            var child = buildFakeChild(["onexit"]);
+            var child = sandbox.createSpyObj("onexit");
             container.forTest_addChild(child);
 
             container.remove(child);
 
-            expect(child.onexit).toHaveBeenCalled();
+            expect(child.onexit.calledOnce).toBeTruthy();
         });
         it("删除层内指定元素（uid匹配）", function () {
-            var child1 = buildFakeChild(["onexit"]);
-            var child2 = buildFakeChild(["onexit"]);
-            var child3 = buildFakeChild(["onexit"]);
+            var child1 = sandbox.createSpyObj("onexit");
+            var child2 = sandbox.createSpyObj("onexit");
+            var child3 = sandbox.createSpyObj("onexit");
             testTool.spyReturn(child1, "getUid", 1);
             testTool.spyReturn(child2, "getUid", 2);
             testTool.spyReturn(child3, "getUid", 3);
@@ -313,19 +309,19 @@ describe("NodeContainer", function () {
         });
 
         it("调用精灵onexit", function () {
-            var child1 = buildFakeChild(["onexit"]);
-            var child2 = buildFakeChild(["onexit"]);
+            var child1 = sandbox.createSpyObj("onexit");
+            var child2 = sandbox.createSpyObj("onexit");
             container.forTest_addChilds([child1, child2]);
 
             container.removeAll();
 
-            expect(child1.onexit).toHaveBeenCalled();
-            expect(child2.onexit).toHaveBeenCalled();
+            expect(child1.onexit.calledOnce).toBeTruthy();
+            expect(child2.onexit.calledOnce).toBeTruthy();
         });
         it("删除层内指定元素（uid匹配）", function () {
-            var child1 = buildFakeChild(["onexit"]);
-            var child2 = buildFakeChild(["onexit"]);
-            var child3 = buildFakeChild(["onexit"]);
+            var child1 = sandbox.createSpyObj("onexit");
+            var child2 = sandbox.createSpyObj("onexit");
+            var child3 = sandbox.createSpyObj("onexit");
             testTool.spyReturn(child1, "getUid", 1);
             testTool.spyReturn(child2, "getUid", 2);
             testTool.spyReturn(child3, "getUid", 3);
@@ -360,14 +356,14 @@ describe("NodeContainer", function () {
             var child1 = null,
                 child2 = null;
 
-            child1 = buildFakeChild(["draw"]);
-            child2 = buildFakeChild(["draw"]);
+            child1 = sandbox.createSpyObj("draw");
+            child2 = sandbox.createSpyObj("draw");
             container.forTest_addChilds([child1, child2]);
 
             container.iterator("draw", 1);
 
-            expect(child1.draw).toHaveBeenCalledWith(1);
-            expect(child2.draw).toHaveBeenCalledWith(1);
+            expect(child1.draw.calledWith(1)).toBeTruthy();
+            expect(child2.draw.calledWith(1)).toBeTruthy();
         });
     });
 
